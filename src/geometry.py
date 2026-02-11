@@ -1,7 +1,5 @@
 #%%
 from pathlib import Path
-from typing import Iterable
-
 import geopandas as gpd
 import numpy as np
 from shapely.geometry import box
@@ -45,90 +43,57 @@ def get_bounding_box(gdf: gpd.GeoDataFrame) -> np.ndarray:
     bounds = gdf.total_bounds
     return bounds
 
+#%%
 
-def load_quadrangles(quadrangles: str | Path | gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-    # Accept either a path or an already-loaded GeoDataFrame
-    if isinstance(quadrangles, gpd.GeoDataFrame):
-        gdf = quadrangles.copy()
-    else:
-        gdf = gpd.read_file(Path(quadrangles))
-    if gdf.crs is None:
-        gdf.set_crs(epsg=4326, inplace=True)
+def load_all_quads(filepath: str | Path) -> gpd.GeoDataFrame:
+    """
+    Docstring for load_quads
+    
+    :param filepath: Description
+    :type filepath: str | Path
+    :return: Description
+    :rtype: GeoDataFrame
+
+    TODO: Docstrings
+    
+    """
+    filepath = Path(filepath)
+    gdf = gpd.read_file(filepath)
     return gdf
+#%%
 
+def get_quads(boundary, all_quads):
+    """
+    Docstring for get_quads
+    
+    :param bounds: Description
 
-def _resolve_column(columns: Iterable[str], candidates: Iterable[str]) -> str | None:
-    lowered = {c.lower(): c for c in columns}
-    for candidate in candidates:
-        if candidate.lower() in lowered:
-            return lowered[candidate.lower()]
-    return None
+    TODO: Docstrings
+    TODO: Annotations for function arguments and return
+    TODO: Ensure CRS consistency before intersect command
 
+    """
+    minx, miny, maxx, maxy = boundary.total_bounds
+    bbox = box(minx, miny, maxx, maxy)
+    quads = all_quads[all_quads.intersects(bbox)].copy()
+    return set(quads['CELL_ID'])
 
-def get_quadrangles_intersecting_bbox(
-    boundary_gdf: gpd.GeoDataFrame,
-    quadrangles: str | Path | gpd.GeoDataFrame,
-    id_col: str | None = None,
-    name_col: str | None = None,
-) -> gpd.GeoDataFrame:
-    # Build a bbox geometry from the boundary and intersect with quads
-    boundary_gdf = boundary_gdf.copy()
-    if boundary_gdf.crs is None:
-        boundary_gdf.set_crs(epsg=4326, inplace=True)
+# %%
 
-    quads = load_quadrangles(quadrangles)
-    if quads.crs != boundary_gdf.crs:
-        quads = quads.to_crs(boundary_gdf.crs)
+def get_species(cnps_df, quads):
+    """
+    Docstring for species_in_quads
+    
+    :param species: Description
+    :param quads: Description
+    # THis is the command to filter the CNPS data on the set of quads we find
+    #    Is assume the CNPS list of quads is in the column called 'QUAD_IDS' and the 
+    # CNPS data is a dataframe called... df!
+    # Also, quad_ids is a set of IDs!
 
-    minx, miny, maxx, maxy = boundary_gdf.total_bounds
-    bbox_geom = box(minx, miny, maxx, maxy)
-    hits = quads[quads.intersects(bbox_geom)].copy()
-
-    id_col = id_col or _resolve_column(
-        hits.columns,
-        [
-            "quad_id",
-            "quadid",
-            "quad_code",
-            "quadcode",
-            "quad_num",
-            "quadnum",
-            "map_id",
-            "mapid",
-            "usgs_id",
-            "usgsid",
-            "gnis_id",
-            "gnisid",
-            "id",
-        ],
-    )
-
-    name_col = name_col or _resolve_column(
-        hits.columns,
-        [
-            "quad_name",
-            "quadname",
-            "map_name",
-            "mapname",
-            "name",
-            "title",
-        ],
-    )
-
-    if id_col is None:
-        raise ValueError(
-            "Could not infer a quadrangle ID column. "
-            "Pass id_col explicitly (e.g., id_col='QUAD_CODE')."
-        )
-
-    cols = [id_col]
-    if name_col is not None and name_col != id_col:
-        cols.append(name_col)
-
-    result = hits[cols].drop_duplicates()
-    result = result.rename(columns={id_col: "quad_id", name_col: "quad_name"})
-    result = result.sort_values(by=["quad_id"]).reset_index(drop=True)
-    return result
+    """
+    cnps_species = df[df['QUAD_IDS'].apply(lambda x: bool(quad_ids.intersection(x)))].copy()
+    return cnps_species
 
 
 
