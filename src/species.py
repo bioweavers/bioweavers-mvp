@@ -1,4 +1,5 @@
 #%%
+from pathlib import Path
 import requests
 import pandas as pd
 
@@ -44,3 +45,14 @@ def query_inaturalist(bounding_box, limit=100) -> pd.DataFrame:
 
 
 #%%
+# Create function to refactor the CNPS 'Quads' column
+def refactor_cnps(file_path: str | Path) -> pd.DataFrame:
+    # TODO: Add documentation
+    # Read the CNPS csv file
+    file_path = Path(file_path)    
+    cnps = pd.read_csv(file_path)
+    # Refactor the 'Quads' column to extract the quad IDs as a list of integers
+    cnps["split_quad"] = (cnps["Quads"].str.findall(r'\d+')).apply(
+    lambda lst: [int(x) for x in lst] if isinstance(lst, list) else lst
+)
+    return cnps
