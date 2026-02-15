@@ -1,6 +1,7 @@
 #%%
 import requests
 import pandas as pd
+from pathlib import Path
 
 INATURALIST_API_URL = "https://api.inaturalist.org/v1/observations"
 
@@ -44,3 +45,14 @@ def query_inaturalist(bounding_box, limit=100) -> pd.DataFrame:
 
 
 #%%
+def refactor_cnps(file_path: str | Path) -> pd.DataFrame:
+    # Read the CSV file
+    cnps = pd.read_csv(file_path)
+    # Split the 'Quads' column into a list of integers
+    cnps['split_quad'] = cnps['Quads'].str.findall(r'\d+').apply(
+        # Convert the list of strings to a list of integers, or return the original value if it's not a list
+        lambda lst: [int(x) for x in lst] if isinstance(lst, list) else lst)
+    # Return the modified DataFrame
+    return cnps
+
+# %%
