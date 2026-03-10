@@ -25,6 +25,12 @@ def _make_quads():
         crs=4326,
     )
 
+def _make_cnps():
+    return pd,.DataFrame({
+        'ScientificName': ['Species A', 'Species B', 'Species C'],
+        'split_quad': [3411728, 3411814, 3311776, 3411826], [3411814, 3411922, 3411934, 3411932],  [3411814, 3211782], # is this how we would create a list of quads
+        'geometry': [box(-120.1, 34.1, -119.9, 34.3), box(-119.8, 34.0, -119.6, 34.2), box(-120.5, 35.0, -120.3, 35.2)]
+    }, crs=4326)
     
 
 # def test_load_boundary(tmp_path):
@@ -75,4 +81,3 @@ def test_get_quads():
     assert intersecting_quads == expected_quad_ids
 
  # def test_get_species():  # THIS TEST REQUIRES MAKING A MOCK CNPS AND CNDDB DATAFRAME, WHICH IS A LOT OF WORK. MAYBE WE CAN DO THIS LATER.
- 
