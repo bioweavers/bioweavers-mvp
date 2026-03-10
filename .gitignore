@@ -5,4 +5,4 @@ __pycache__/
 output/
 .DS_Store
 
-data/cnddb_obfs_dataset_V2/
+data/cnddb_obfs_dataset_V2
