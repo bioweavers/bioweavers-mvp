@@ -9,4 +9,5 @@ openpyxl
 ipykernel
 python-docx
 docxtpl
+setuptools      # provides pkg_resources (needed for Python 3.12+)
 
