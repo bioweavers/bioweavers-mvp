@@ -35,19 +35,6 @@ The template engine (Jinja2) combines the template + data to produce output.
 
 ---
 
-## Why Use Templates?
-
-| Without Templates | With Templates |
-|-------------------|----------------|
-| Format mixed with logic | Format and logic separated |
-| Hard to modify layout | Easy to change layout |
-| Programmers control everything | Non-programmers can edit templates |
-| Changes require code changes | Changes often just need template edits |
-
-For Bio Weavers: Rincon can design/adjust the Word document format without touching Python code.
-
----
-
 ## Jinja2 Basics
 
 Jinja2 is a popular Python templating engine. It uses special syntax to mark where data should go.
@@ -61,10 +48,10 @@ Hello, {{ name }}!
 The project is located in {{ location }}.
 ```
 
-With data `{'name': 'Kelly', 'location': 'Santa Barbara'}`:
+With data `{'name': 'Bioweavers', 'location': 'Santa Barbara'}`:
 
 ```
-Hello, Kelly!
+Hello, Bioweavers!
 The project is located in Santa Barbara.
 ```
 
@@ -88,12 +75,12 @@ Curly-brace-percent for logic (loops, conditionals):
 {% endfor %}
 ```
 
-With data `{'items': ['apple', 'banana', 'cherry']}`:
+With data `{'items': ['birds', 'snakes', 'aeroplanes']}`:
 
 ```
-  - apple
-  - banana
-  - cherry
+  - birds
+  - snakes
+  - aeroplanes
 ```
 
 #### Looping Over Dictionaries
@@ -299,44 +286,6 @@ Inside a `{% for %}` loop, you have access to:
 
 ---
 
-## Try It Yourself
-
-Create a file `practice.py`:
-
-```python
-from jinja2 import Template
-
-# Simple template
-template = Template("""
-Shopping List for {{ store }}:
-{% for item in items %}
-  {{ loop.index }}. {{ item.name }} - ${{ item.price }}
-{% endfor %}
-Total items: {{ items | length }}
-""")
-
-# Data
-data = {
-    'store': 'Whole Foods',
-    'items': [
-        {'name': 'Avocados', 'price': 5.99},
-        {'name': 'Oat Milk', 'price': 4.49},
-        {'name': 'Quinoa', 'price': 7.99},
-    ]
-}
-
-# Render
-print(template.render(data))
-```
-
-Run it:
-```bash
-pip install jinja2
-python practice.py
-```
-
----
-
 ## Summary
 
 1. **Templates** separate structure from data
@@ -345,12 +294,11 @@ python practice.py
 4. **Conditionals** show/hide content based on conditions
 5. **docxtpl** extends Jinja2 for Word docs with `{%tr %}` for table rows
 
-The key insight: **your DataFrame becomes the data, the Word doc becomes the template, and Jinja2 connects them.**
+The key insight: **your DataFrame contains the data, the Word template doc contains the structure, and Jinja2 connects them.**
 
 ---
 
 ## Resources
 
-- [Jinja2 Documentation](https://jinja.palletsprojects.com/)
 - [Jinja2 Template Designer Documentation](https://jinja.palletsprojects.com/en/3.1.x/templates/)
 - [docxtpl Documentation](https://docxtpl.readthedocs.io/)

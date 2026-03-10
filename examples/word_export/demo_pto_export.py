@@ -11,10 +11,14 @@ Requirements:
     pip install python-docx docxtpl pandas
 """
 
+#%%
+
 import pandas as pd
 from pathlib import Path
 from datetime import date
 from docxtpl import DocxTemplate
+
+#%%
 
 # Sample species data (simulating query results)
 SAMPLE_DATA = [
@@ -55,6 +59,7 @@ SAMPLE_DATA = [
     },
 ]
 
+#%%
 
 def generate_pto_document(
     species_df: pd.DataFrame,
@@ -115,44 +120,21 @@ def generate_pto_document(
     
     return output
 
+#%%
 
-def main():
-    """Run the demo."""
-    
-    # Check for template
-    template_path = Path(__file__).parent / 'pto_template.docx'
-    if not template_path.exists():
-        print("Template not found. Creating it first...")
-        print("Run: python create_template.py")
-        print("Or run this script again after creating the template.")
-        
-        # Auto-create template
-        import create_template
-        create_template.create_pto_template()
-    
-    # Create DataFrame from sample data
-    df = pd.DataFrame(SAMPLE_DATA)
-    
-    print("Input DataFrame:")
-    print(df[['common_name', 'status', 'pto']].to_string(index=False))
-    print()
-    
-    # Generate document
-    output_path = Path(__file__).parent / 'output_pto_report.docx'
-    
-    result = generate_pto_document(
-        species_df=df,
-        template_path=str(template_path),
-        output_path=str(output_path),
-        project_name="Coastal Development Project",
-        project_location="Goleta, Santa Barbara County, CA",
-        buffer_radius="5-mile"
-    )
-    
-    print(f"✓ Generated: {result}")
-    print(f"  • {len(df)} species in table")
-    print(f"  • Open in Word to verify formatting")
+# Example usage:
+# Commented out to avoid running it by default
+''' 
+template_path = Path(__file__).parent / 'pto_template.docx'
+df = pd.DataFrame(SAMPLE_DATA)
+output_path = Path(__file__).parent / 'output_pto_report.docx'
+result = generate_pto_document(
+    species_df=df,
+    template_path=str(template_path),
+    output_path=str(output_path),
+    project_name="Coastal Development Project",
+    project_location="Goleta, Santa Barbara County, CA",
+    buffer_radius="5-mile"
+)
+'''
 
-
-if __name__ == '__main__':
-    main()
