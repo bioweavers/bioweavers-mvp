@@ -7,4 +7,6 @@ notebook
 pytest
 openpyxl
 ipykernel
+python-docx
+docxtpl
 
