@@ -196,11 +196,6 @@ def get_species_cnps(cnps_df, quad_ids):
         A DataFrame containing the species from the CNPS data that are found in the quads that intersect with the boundary.
     '''
 
-    # THis is the command to filter the CNPS data on the set of quads we find
-    #    Is assume the CNPS list of quads is in the column called 'QUAD_IDS' and the 
-    # CNPS data is a dataframe called... df!
-    # Also, quad_ids is a set of IDs!
-
     cnps_species = cnps_df[cnps_df['split_quad'].apply(lambda x: bool(quad_ids.intersection(x)))].copy()
     return cnps_species
 
