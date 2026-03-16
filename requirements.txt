@@ -7,4 +7,7 @@ notebook
 pytest
 openpyxl
 ipykernel
+python-docx
+docxtpl
+setuptools<78   # pinned: docxcompose uses deprecated pkg_resources (removed in v78+)
 

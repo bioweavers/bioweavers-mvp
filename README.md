@@ -23,6 +23,8 @@ bioweavers-mvp/
 │   └── test_species.py
 ├── data/
 │   └── sample_boundary.geojson
+├── examples/
+│   └── word_export/          # DataFrame → Word document demo
 ├── output/
 ├── notebooks/
 └── docs/
@@ -47,6 +49,36 @@ pytest
 ## Notes
 - Buffering uses EPSG:3310 (CA Albers) for meter-accurate buffers, then returns to EPSG:4326 for API usage.
 - iNaturalist requests are not executed in tests; network tests can be added later.
+
+## Examples
+
+### Word Document Export (`examples/word_export/`)
+
+Demonstrates generating Word documents with dynamic tables from pandas DataFrames using **docxtpl** (Jinja2 templating for Word).
+
+```bash
+cd examples/word_export
+python demo_pto_export.py
+open output_pto_report.docx
+```
+
+**How it works:**
+1. Create a Word template with Jinja2 placeholders (e.g., `{{ species.name }}`)
+2. Use `{%tr for item in list %}` to mark table rows that should repeat
+3. docxtpl clones the template row for each item in your DataFrame
+
+**Files:**
+| File | Purpose |
+|------|---------|
+| `create_template.py` | Programmatically creates a Word template (bootstrap helper) |
+| `demo_pto_export.py` | Main demo: DataFrame → Word document |
+| `pto_template.docx` | The Word template with Jinja2 placeholders |
+| `README.md` | Detailed documentation |
+
+**Why this approach:**
+- Pure Python (no external binaries like pandoc)
+- Template is a real Word doc — non-programmers can edit formatting
+- Preserves fonts, styles, company branding from the template
 
 
 ## Jupyter Kernel Setup
