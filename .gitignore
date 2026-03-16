@@ -5,5 +5,6 @@ __pycache__/
 output/
 .DS_Store
 
-# Word export example outputs (keep templates)
-examples/word_export/output_*.docx
+data/cnddb_obfs_dataset_V2
+
+data/cnddb_obfs_dataset_V2.csv
