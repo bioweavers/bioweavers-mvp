@@ -10,4 +10,8 @@ ipykernel
 python-docx
 docxtpl
 setuptools<78   # pinned: docxcompose uses deprecated pkg_resources (removed in v78+)
+streamlit==1.27.2
+requests
+streamlit-folium
+plotly
 
