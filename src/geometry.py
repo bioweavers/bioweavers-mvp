@@ -34,8 +34,11 @@ def load_boundary(file_path: str | Path) -> gpd.GeoDataFrame:
     # Handle different file formats
     # For now, we will assume that the file is a GeoJSON or Shapefile
     # Add kmz support in the future
+    
+    # Read the boundary file using geopandas.
     file_path = Path(file_path)    
     gdf = gpd.read_file(file_path)
+
     # Set the CRS to WGS84 (EPSG:4326) if it is not already set
     if gdf.crs is None:
         gdf.set_crs(epsg=4326, inplace=True)
@@ -69,13 +72,16 @@ def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
     # TODO: Add documentation
     # Distance should be in meters to match the 
     # CRS we will use for buffering (California Albers)
-    # Create a buffer around the geometries in the GeoDataFrame
-    # create a copy of the GeoDataFrame to avoid modifying the original
+   
+    # Create a copy of the GeoDataFrame to avoid modifying the original
     gdf_buffered = gdf.copy()
+
     # Set the CRS to the California Albers (EPSG:3310) 
-    # for accurate distance measurements
     gdf_buffered = gdf_buffered.to_crs(epsg=3310)
+
+    # Create a buffer around the geometries in the GeoDataFrame
     gdf_buffered['geometry'] = gdf_buffered.geometry.buffer(distance)
+
     # Return the buffered GeoDataFrame in the original CRS
     gdf_buffered = gdf_buffered.to_crs(epsg=4326)
     return gdf_buffered
@@ -102,6 +108,7 @@ def get_bounding_box(gdf: gpd.GeoDataFrame) -> np.ndarray:
     Returns an array with the bounding box coordinates [minx, miny, maxx, maxy] of the geometries in the GeoDataFrame.
     '''
 
+    # Get the total bounds of the geometries in the GeoDataFrame.
     bounds = gdf.total_bounds
     return bounds
 
@@ -121,7 +128,8 @@ def load_all_quads(filepath: str | Path) -> gpd.GeoDataFrame:
     gpd.GeoDataFrame
         GeoDataFrame with the quad geometries loaded from the file
     '''
-
+    
+    # Load all the California quad geometries from the file using geopandas.
     filepath = Path(filepath)
     gdf = gpd.read_file(filepath)
     return gdf
@@ -144,9 +152,17 @@ def _cell_map_code(id):
             The function parses the 'CELL_MAPCODE' string, extracts the numeric part and the letter, 
             converts the letter to a number (A=1, B=2, ..., H=8), and combines them to create a unique integer ID for the quad.
     '''
+
+    # Split the 'CELL_MAPCODE' value into the lead part and the tail part.
     lead, tail = str(id).split('-')
+
+    # Create a mapping of letters to numbers for the tail part.
     pos = ['','A','B','C','D','E','F','G','H']
+
+    # Find the letter in the tail part and convert it to a number using the mapping.
     my_num = pos.index(tail[0])
+
+    # Combine the lead part and the numeric value of the letter to create a unique integer ID for the quad.
     cell_map_code = str(lead) + str(my_num) + str(tail[1])
     return int(cell_map_code)
 
@@ -169,10 +185,19 @@ def get_quads(boundary, all_quads):
     '''
 
     #TODO: Ensure CRS consistency before intersect command
+
+    assert boundary.crs == all_quads.crs, "CRS of boundary and all_quads GeoDataFrames must be the same before performing intersection."
+
+    # Get total bounds of the boundary GeoDataFrame.
     minx, miny, maxx, maxy = boundary.total_bounds
+
+    # Create a bounding box geometry from total bounds coordinates of the boundary GeoDataFrame.
     bbox = box(minx, miny, maxx, maxy)
+
+    # Filter the quads that intersect with the bounding box.
     quads = all_quads[all_quads.intersects(bbox)].copy()
-    # This next line should work, but might not.
+
+    # Refactor the 'CELL_MAPCODE' column in the quads GeoDataFrame to extract quad IDs as a list of integers and return a set of unique quad IDs.
     cell_map_codes = [_cell_map_code(id) for id in set(quads['CELL_MAPCODE'])]
     return set(cell_map_codes)
 
@@ -196,6 +221,7 @@ def get_species_cnps(cnps_df, quad_ids):
         A DataFrame containing the species from the CNPS data that are found in the quads that intersect with the boundary.
     '''
 
+    # Filter the CNPS DataFrame to include only the rows where the 'split_quad' column contains at least one quad ID that is in the set of quad IDs that intersect with the boundary.
     cnps_species = cnps_df[cnps_df['split_quad'].apply(lambda x: bool(quad_ids.intersection(x)))].copy()
     return cnps_species
 
@@ -222,6 +248,8 @@ def get_species_cnddb(file_path: str | Path, quad_ids):
     # Read the CNDDB csv file
     file_path = Path(file_path)    
     cnddb_df = pd.read_csv(file_path)
+
+    # Filter the CNDDB DataFrame to include only the rows where the 'KEYQUAD' column contains a quad ID that is in the set of quad IDs that intersect with the boundary.
     cnddb_species = cnddb_df[cnddb_df['KEYQUAD'].isin(quad_ids)].copy()
     return cnddb_species
 
