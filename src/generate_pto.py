@@ -15,7 +15,7 @@ import pandas as pd
 import os
 from pathlib import Path
 from datetime import date
-from docxtpl import DocxTemplate
+from docxtpl import DocxTemplate, RichText
 
 from geometry import get_species_cnps
 from species import refactor_cnps
@@ -32,7 +32,7 @@ from species import refactor_cnps
 
 
 def generate_pto_document(
-    species_df: pd.DataFrame,
+    species_df: pd.DataFrame, #would we need 2? for cnps and cnddb
     template_path: str,
     output_path: str,
     project_name: str = "Sample Project",
@@ -66,7 +66,7 @@ def generate_pto_document(
 
     # Build species records formatted for the template
     species_data = []
-    for _, row in species_df.iterrows():
+    for _, row in species_df.iterrows(): # works for CNPS not CNDDB
         # Format status block
         fesa = row.get("FESA", "None") if pd.notna(row.get("FESA")) else "None"
         cesa = row.get("CESA", "None") if pd.notna(row.get("CESA")) else "None"
@@ -82,15 +82,22 @@ def generate_pto_document(
         elev_high = row.get("ElevationHigh_ft", "") if pd.notna(row.get("ElevationHigh_ft")) else ""
         bloom = row.get("BloomingPeriod", "") if pd.notna(row.get("BloomingPeriod")) else ""
 
-        habitat_text = f"{habitat} Elevations: {elev_low}-{elev_high}ft. Blooms {bloom}."
+        habitat_text = f"{habitat} Elevations: {elev_low:.0f}-{elev_high:.0f}ft. Blooms {bloom}."
 
+        # Format scientific and common name
+        name = row.get("ScientificName", "") # TODO: Do we want to let empty species names through?? Or error?
+        #name.add("\n")
+        #name.add(row.get("CommonName", ""))
+
+        common_name = row.get("CommonName", "")
         species_data.append({
-            "scientific_name": row.get("ScientificName", ""),
-            "common_name": row.get("CommonName", ""),
+            "name": name,
+            "common_name": common_name,
             "status": status,
             "habitat": habitat_text,
         })
 
+    
     # Build context for template
     context = {
         "project_name": project_name,
@@ -111,7 +118,7 @@ def main():
     """Run the demo."""
     
     # Check for template
-    template_path = Path(__file__).parent / 'pto_template.docx'
+    template_path = Path(__file__).parent / 'pto_template2.docx'
     #if not template_path.exists():
         #print("Template not found. Creating it first...")
         #print("Run: python create_template.py")
@@ -126,9 +133,15 @@ def main():
     cnps_path = os.path.join(os.path.dirname(__file__), "..", "data", "CNPS_RAW.csv")
     cnps_df = refactor_cnps(cnps_path)
 
+    # Load and filter CNDDB data
+    cnddb_path = os.path.join(os.path.dirname(__file__), "..", "data", "cnddb_test_data.csv")
+
     # Define quad IDs
-    quad_ids = {3211465, 3211466, 3211467}  
+    quad_ids = {3411814, 3411815, 3411816, 3411824, 3411825, 3411826}  
+
     df = get_species_cnps(cnps_df, quad_ids)
+    # df = get_species_cnddb(cnddb_path, quad_ids)
+    # how to join/whether to join these? maybe create if else for formatting 
 
     print(f"Found {len(df)} species in quads")
     
@@ -139,8 +152,8 @@ def main():
         species_df=df,
         template_path=str(template_path),
         output_path=str(output_path),
-        project_name="Coastal Development Project",
-        project_location="Goleta, Santa Barbara County, CA"
+        project_name="Palisades Fire Boundary",
+        project_location="Los Angeles County, CA"
     )
     
     print(f"✓ Generated: {result}")
