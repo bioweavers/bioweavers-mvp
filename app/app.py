@@ -87,24 +87,36 @@ st.session_state.formatted_cnddb = edited_cnddb
 # ---------------------------------------------------------
 # EXPORT TO WORD
 # ---------------------------------------------------------
-buffer = BytesIO()
+def make_buffer():
+    
+    buffer = BytesIO()
 
-doc = DocxTemplate("app/utils/pto_template.docx")
-context = {
-    #"project_name": "Boulder Peak Project",
-    #"project_location": "Boulder Peak",
-    #"buffer_radius": "TBD",
-    #"assessment_date": pd.Timestamp.today().strftime("%Y-%m-%d"),
-    "cnps_rows": st.session_state.formatted_cnps.to_dict(orient="records"),
-    "cnddb_rows": st.session_state.formatted_cnddb.to_dict(orient="records"),
-}
-doc.render(context)
-doc.save(buffer)
-buffer.seek(0)
+    doc = DocxTemplate("app/utils/pto_template.docx")
+
+    edited_cnps = edited_combined[edited_combined["Source"] == "CNPS"].drop(columns=["_row_id"]).reset_index(drop=True)
+    edited_cnddb = edited_combined[edited_combined["Source"] == "CNDDB"].drop(columns=["_row_id"]).reset_index(drop=True)
+
+    st.session_state.formatted_cnps = edited_cnps
+    st.session_state.formatted_cnddb = edited_cnddb
+
+    context = {
+        #"project_name": "Boulder Peak Project",
+        #"project_location": "Boulder Peak",
+        #"buffer_radius": "TBD",
+        #"assessment_date": pd.Timestamp.today().strftime("%Y-%m-%d"),
+        "cnps_rows": st.session_state.formatted_cnps.to_dict(orient="records"),
+        "cnddb_rows": st.session_state.formatted_cnddb.to_dict(orient="records"),
+    }
+    doc.render(context)
+    doc.save(buffer)
+    buffer.seek(0)
+
+    return buffer
+
 
 st.download_button(
     label="Export to Word",
-    data=buffer,
+    data=make_buffer,
     file_name="pto_report.docx",
     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 )
