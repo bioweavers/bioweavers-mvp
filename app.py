@@ -92,113 +92,113 @@ if uploaded_file is not None:
     initial_view_state=view_state,      # Set initial view to center on the boundary.
     map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"))  # Add a basemap.
 
-    # # View project boundary with an applied buffer.
-    # st.title("Applying Buffer Search")
+    # View project boundary with an applied buffer.
+    st.title("Applying Buffer Search")
 
-    # # Define buffer search options for `st.radio()`.
-    # buffer_option_names = ['2-Mile', '5-Mile', '10-Mile', '9-Quad']
+    # Define buffer search options for `st.radio()`.
+    buffer_option_names = ['2-Mile', '5-Mile', '10-Mile', '9-Quad']
 
-    # # Create a radio button for buffer search options.
-    # # buffer_choice = st.radio("Select a buffer search option:", buffer_option_names)
+    # Create a radio button for buffer search options.
+    # buffer_choice = st.radio("Select a buffer search option:", buffer_option_names)
 
-    # # search_area = None
+    # search_area = None
 
-#     buffer_choice = st.radio("Select a buffer search option:", buffer_option_names, key="buffer_radio")
-#     run_buffer = st.button("Apply Buffer")  # ADD THIS
+    buffer_choice = st.radio("Select a buffer search option:", buffer_option_names, key="buffer_radio")
+    run_buffer = st.button("Apply Buffer")  # ADD THIS
 
-#     if run_buffer:  # only runs when clicked
-#         if buffer_choice == '2-Mile':
-#             distance = 4828.03
-#             search_area = create_buffer(project_boundary_gdf, distance)
-#         elif buffer_choice == '5-Mile':
-#             distance = 8046.72
-#             search_area = create_buffer(project_boundary_gdf, distance)
-#         elif buffer_choice == '10-Mile':
-#             distance = 16093.4
-#             search_area = create_buffer(project_boundary_gdf, distance)
-#         elif buffer_choice == '9-Quad':
-#             all_quads = all_quads.to_crs(project_boundary_gdf.crs)
-#             quad_ids = get_quads(project_boundary_gdf, all_quads)
-#             buffer_quad_search = get_neighbors(quad_ids, all_quads)
-#             search_area = all_quads[all_quads['CELL_MAPCODE'].apply(_cell_map_code).isin(buffer_quad_search)]
+    if run_buffer:  # only runs when clicked
+        if buffer_choice == '2-Mile':
+            distance = 4828.03
+            search_area = create_buffer(project_boundary_gdf, distance)
+        elif buffer_choice == '5-Mile':
+            distance = 8046.72
+            search_area = create_buffer(project_boundary_gdf, distance)
+        elif buffer_choice == '10-Mile':
+            distance = 16093.4
+            search_area = create_buffer(project_boundary_gdf, distance)
+        elif buffer_choice == '9-Quad':
+            all_quads = all_quads.to_crs(project_boundary_gdf.crs)
+            quad_ids = get_quads(project_boundary_gdf, all_quads)
+            buffer_quad_search = get_neighbors(quad_ids, all_quads)
+            search_area = all_quads[all_quads['CELL_MAPCODE'].apply(_cell_map_code).isin(buffer_quad_search)]
 
-#     # Display the search area on a map using pydeck.
-#     if search_area is not None:
+    # Display the search area on a map using pydeck.
+    if search_area is not None:
 
-#         # Reproject search area to WGS84 for mapping.
-#         search_area_wgs = search_area.to_crs(epsg=4326)
+        # Reproject search area to WGS84 for mapping.
+        search_area_wgs = search_area.to_crs(epsg=4326)
 
-#         # Convert search area GeoDataFrame to GeoJSON format for pydeck.
-#         geojson_search = json.loads(search_area.to_json())
+        # Convert search area GeoDataFrame to GeoJSON format for pydeck.
+        geojson_search = json.loads(search_area.to_json())
 
-#         # Calculate the center of the search area for initial map view.
-#         minx, miny, maxx, maxy = search_area_wgs.total_bounds
-#         center_lat = (miny + maxy) / 2
-#         center_lon = (minx + maxx) / 2
+        # Calculate the center of the search area for initial map view.
+        minx, miny, maxx, maxy = search_area_wgs.total_bounds
+        center_lat = (miny + maxy) / 2
+        center_lon = (minx + maxx) / 2
 
-#         # Create a pydeck layer to display the buffered project boundary.
-#         buffer_layer = pdk.Layer(
-#             type="GeoJsonLayer",
-#             data=geojson_search,
-#             stroked=True,                           # Display the boundary of the buffer.
-#             filled=True,
-#             get_fill_color=[0, 140, 255, 80],       # Fill color of the buffer.
-#             get_line_color=[0, 0, 255],             # Line color of the buffer boundary.
-#             line_width_min_pixels=1,                # Minimum line width to ensure visibility at all zoom levels.
-#         )
+        # Create a pydeck layer to display the buffered project boundary.
+        buffer_layer = pdk.Layer(
+            type="GeoJsonLayer",
+            data=geojson_search,
+            stroked=True,                           # Display the boundary of the buffer.
+            filled=True,
+            get_fill_color=[0, 140, 255, 80],       # Fill color of the buffer.
+            get_line_color=[0, 0, 255],             # Line color of the buffer boundary.
+            line_width_min_pixels=1,                # Minimum line width to ensure visibility at all zoom levels.
+        )
 
-#         # Set the initial view state of the map to center on the search area.
-#         view_state = pdk.ViewState(
-#             latitude=center_lat,
-#             longitude=center_lon,
-#             zoom=10,
-#             pitch=0
-#         )
+        # Set the initial view state of the map to center on the search area.
+        view_state = pdk.ViewState(
+            latitude=center_lat,
+            longitude=center_lon,
+            zoom=10,
+            pitch=0
+        )
 
-#         # Render the map with buffer and project boundary layers.
-#         st.pydeck_chart(pdk.Deck(
-#             layers=[buffer_layer, project_boundary_layer],      # `project_boundary_layer` is defined in the previous cell and will be rendered on top of the buffer layer.
-#             initial_view_state=view_state,
-#             map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-#         ))
+        # Render the map with buffer and project boundary layers.
+        st.pydeck_chart(pdk.Deck(
+            layers=[buffer_layer, project_boundary_layer],      # `project_boundary_layer` is defined in the previous cell and will be rendered on top of the buffer layer.
+            initial_view_state=view_state,
+            map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+        ))
 
 
-#     # After defining the search area, query the CNDDB and CNPS datasets.
-#     if run_buffer and search_area is not None:
+    # After defining the search area, query the CNDDB and CNPS datasets.
+    if run_buffer and search_area is not None:
 
-#         # Extract the quad IDs from the search area. (IS THIS WHAT ITS DOING)
-#         if buffer_choice == '9-Quad':
-#             # `Search_area` is already quads, extract IDs directly.
-#             search_quad_ids = set(search_area['CELL_MAPCODE'].apply(_cell_map_code).tolist())
-#         else:
-#             # Reproject quads to match the search area CRS for accurate spatial intersection.
-#             all_quads_reproj = all_quads.to_crs(search_area.crs)
-#             # `Search_area` is a buffered polygon, find which quads intersect it.
-#             search_quad_ids = get_quads(search_area, all_quads_reproj)
+        # Extract the quad IDs from the search area. (IS THIS WHAT ITS DOING)
+        if buffer_choice == '9-Quad':
+            # `Search_area` is already quads, extract IDs directly.
+            search_quad_ids = set(search_area['CELL_MAPCODE'].apply(_cell_map_code).tolist())
+        else:
+            # Reproject quads to match the search area CRS for accurate spatial intersection.
+            all_quads_reproj = all_quads.to_crs(search_area.crs)
+            # `Search_area` is a buffered polygon, find which quads intersect it.
+            search_quad_ids = get_quads(search_area, all_quads_reproj)
 
-#         # Query CNDDB dataset using the extracted quad IDs.
-#         cnddb_species = get_species_cnddb(cnddb_path, search_quad_ids)
+        # Query CNDDB dataset using the extracted quad IDs.
+        cnddb_species = get_species_cnddb(cnddb_path, search_quad_ids)
 
-#         # Query CNPS dataset using the extracted quad IDs.    
-#         cnps_species = get_species_cnps(cnps, search_quad_ids)
+        # Query CNPS dataset using the extracted quad IDs.    
+        cnps_species = get_species_cnps(cnps, search_quad_ids)
 
-#         # Display the results in tables.
-#         st.subheader("CNDDB Species Results")
-#         st.write(f"Found {len(cnddb_species)} species occurrences")
-#         st.dataframe(cnddb_species.drop(columns='geometry'))
+        # Display the results in tables.
+        st.subheader("CNDDB Species Results")
+        st.write(f"Found {len(cnddb_species)} species occurrences")
+        st.dataframe(cnddb_species.drop(columns='geometry'))
 
-#         # Display the results in tables.
-#         st.subheader("CNPS Species Results")
-#         st.write(f"Found {len(cnps_species)} species occurrences")
-#         st.dataframe(cnps_species)
+        # Display the results in tables.
+        st.subheader("CNPS Species Results")
+        st.write(f"Found {len(cnps_species)} species occurrences")
+        st.dataframe(cnps_species)
 
-#         # Map CNDDB species occurrences within the project boundary.
-#         st.subheader("CNDDB Species Map")
-#         plot_species_map_streamlit(cnddb_species, search_area, project_boundary_gdf) 
+        # Map CNDDB species occurrences within the project boundary.
+        st.subheader("CNDDB Species Map")
+        plot_species_map_streamlit(cnddb_species, search_area, project_boundary_gdf) 
 
-#         # Graph the number of CNDDB species occurrences .
-#         st.subheader("CNDDB Species Occurrence Date Range")
-#         plot_cnddb_species_distribution_streamlit(cnddb_species)
+        # Graph the number of CNDDB species occurrences .
+        st.subheader("CNDDB Species Occurrence Date Range")
+        plot_cnddb_species_distribution_streamlit(cnddb_species)
 
 
 
