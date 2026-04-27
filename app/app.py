@@ -14,6 +14,10 @@ if "cnps_raw" not in st.session_state:
 if "cnddb_raw" not in st.session_state:
     st.session_state.cnddb_raw = pd.read_csv("app/data/cnddb_test_data.csv")
 
+if "editor_version" not in st.session_state:
+    st.session_state.editor_version = 0
+    
+
 # ---------------------------------------------------------
 # FILTER / QUERY SOURCE DATA
 # ---------------------------------------------------------
@@ -73,6 +77,7 @@ edited_combined = st.data_editor(
     width="stretch",
     disabled=["_row_id", "Source", "SpeciesDisplay", "StatusDisplay", "HabitatRequirements"],
     hide_index=True,
+    key=st.session_state.editor_version
 )
 
 # ---------------------------------------------------------

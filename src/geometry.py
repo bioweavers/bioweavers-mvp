@@ -5,6 +5,11 @@ import geopandas as gpd
 import numpy as np
 from shapely.geometry import box
 from pathlib import Path
+import streamlit as st
+from shapely.geometry import shape
+from shapely.ops import unary_union
+from shapely.geometry import mapping
+from shapely.geometry import Polygon
 
 #%%
 # Create a function to load the boundary file and return a GeoDataFrame.
@@ -68,6 +73,8 @@ def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
     Returns a GeoDataFrame with the buffered geometry. 
     The original GeoDataFrame is not modified.
     '''
+    if st.session_state.DEBUG:
+        st.info("Starting create_buffer()...")
 
     # TODO: Add documentation
     # Distance should be in meters to match the 
@@ -75,16 +82,39 @@ def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
    
     # Create a copy of the GeoDataFrame to avoid modifying the original
     gdf_buffered = gdf.copy()
+    
+
+    if st.session_state.DEBUG:
+        st.info(f"\t Ensuring gdf CRS. Current value: {gdf_buffered.crs}")
+    
+    # Set CRS to WGS84 (EPSG:4326) if not already set, and reproject if necessary.
+    if gdf_buffered.crs is None:
+        gdf_buffered = gdf_buffered.set_crs(epsg=4326)
+    else:
+        gdf_buffered = gdf_buffered.to_crs(epsg=4326)
+
+    if st.session_state.DEBUG:
+        st.info(f"\t Assigned gdf CRS. Current value: {gdf_buffered.crs}")
 
     # Set the CRS to the California Albers (EPSG:3310) 
     gdf_buffered = gdf_buffered.to_crs(epsg=3310)
 
+    if st.session_state.DEBUG:
+        st.info(f"\t CRS is {gdf_buffered.crs} which should be the CRS to California Albers (EPSG:3310)")
+
     # Create a buffer around the geometries in the GeoDataFrame
     gdf_buffered['geometry'] = gdf_buffered.geometry.buffer(distance)
 
+    if st.session_state.DEBUG:
+        st.info(f"\t Created a buffer around the geometries of the uploaded project boundary.")
+
+
     # Return the buffered GeoDataFrame in the original CRS
     gdf_buffered = gdf_buffered.to_crs(epsg=4326)
+
+       
     return gdf_buffered
+
 
 #%%
 
