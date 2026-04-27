@@ -5,6 +5,11 @@ import geopandas as gpd
 import numpy as np
 from shapely.geometry import box
 from pathlib import Path
+import streamlit as st
+from shapely.geometry import shape
+from shapely.ops import unary_union
+from shapely.geometry import mapping
+from shapely.geometry import Polygon
 
 #%%
 # Create a function to load the boundary file and return a GeoDataFrame.
@@ -68,6 +73,8 @@ def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
     Returns a GeoDataFrame with the buffered geometry. 
     The original GeoDataFrame is not modified.
     '''
+    if st.session_state.DEBUG:
+        st.info("Starting create_buffer()...")
 
     # TODO: Add documentation
     # Distance should be in meters to match the 
@@ -75,16 +82,39 @@ def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
    
     # Create a copy of the GeoDataFrame to avoid modifying the original
     gdf_buffered = gdf.copy()
+    
+
+    if st.session_state.DEBUG:
+        st.info(f"\t Ensuring gdf CRS. Current value: {gdf_buffered.crs}")
+    
+    # Set CRS to WGS84 (EPSG:4326) if not already set, and reproject if necessary.
+    if gdf_buffered.crs is None:
+        gdf_buffered = gdf_buffered.set_crs(epsg=4326)
+    else:
+        gdf_buffered = gdf_buffered.to_crs(epsg=4326)
+
+    if st.session_state.DEBUG:
+        st.info(f"\t Assigned gdf CRS. Current value: {gdf_buffered.crs}")
 
     # Set the CRS to the California Albers (EPSG:3310) 
     gdf_buffered = gdf_buffered.to_crs(epsg=3310)
 
+    if st.session_state.DEBUG:
+        st.info(f"\t CRS is {gdf_buffered.crs} which should be the CRS to California Albers (EPSG:3310)")
+
     # Create a buffer around the geometries in the GeoDataFrame
     gdf_buffered['geometry'] = gdf_buffered.geometry.buffer(distance)
 
+    if st.session_state.DEBUG:
+        st.info(f"\t Created a buffer around the geometries of the uploaded project boundary.")
+
+
     # Return the buffered GeoDataFrame in the original CRS
     gdf_buffered = gdf_buffered.to_crs(epsg=4326)
+
+       
     return gdf_buffered
+
 
 #%%
 
@@ -201,6 +231,53 @@ def get_quads(boundary, all_quads):
     cell_map_codes = [_cell_map_code(id) for id in set(quads['CELL_MAPCODE'])]
     return set(cell_map_codes)
 
+#%
+def get_neighbors(quad_ids, all_quads: gpd.GeoDataFrame):
+    '''
+    Find the neighboring quads surrounding a center quad.
+
+    Parameters
+    ----------
+    quad_ids : list
+        List containing quad cell IDs
+    all_quads : gpd.GeoDataFrame
+        GeoDataFrame containing all available quads to search
+
+    Returns 
+    ----------
+    set 
+        List of CELL_IDs of all neighboring quads, including the center quad(s).
+    
+    Notes
+    ----------
+    Buffers selected quad's bounding box by 2% on each side to intersect
+    surrounding quads without decimal point precision issues. 
+    '''
+
+    all_quads = all_quads.copy()
+    all_quads['CELL_MAPCODE'] = all_quads['CELL_MAPCODE'].apply(_cell_map_code)
+
+    neighbors = []
+    for id in quad_ids:
+
+        quad = all_quads[all_quads['CELL_MAPCODE'] == id]
+
+        if quad.empty:
+            continue  # skip unmatched IDs
+
+        minx, miny, maxx, maxy = quad.total_bounds
+
+        # Expand quad bbox by 2% on each side
+        dx = (maxx - minx) * 0.02
+        dy = (maxy - miny) * 0.02
+        bbox = box(minx - dx, miny - dy, maxx + dx, maxy + dy)
+
+        neighbor_quads = all_quads[all_quads.intersects(bbox)].copy()
+        neighbors.extend(neighbor_quads['CELL_MAPCODE'].to_list())
+
+    return list(set(neighbors))
+# %%
+
 # %%
 
 # Create a function to filter the CNPS data on the set of quads.
@@ -247,10 +324,37 @@ def get_species_cnddb(file_path: str | Path, quad_ids):
 
     # Read the CNDDB csv file
     file_path = Path(file_path)    
-    cnddb_df = pd.read_csv(file_path)
+    cnddb_gdf = gpd.read_file(file_path)
+
+    cnddb_species = cnddb_gdf[cnddb_gdf['KEYQUAD'].astype(str).isin([str(q) for q in quad_ids])].copy()
 
     # Filter the CNDDB DataFrame to include only the rows where the 'KEYQUAD' column contains a quad ID that is in the set of quad IDs that intersect with the boundary.
-    cnddb_species = cnddb_df[cnddb_df['KEYQUAD'].isin(quad_ids)].copy()
+    #cnddb_species = cnddb_gdf[cnddb_gdf['KEYQUAD'].isin(quad_ids)].copy()
     return cnddb_species
 
+# %%
+if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+
+    # Load data
+    boundary = load_boundary("../data/palisades.geojson")
+    all_quads = load_all_quads("../data/california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson")
+
+    # Reproject quads to match boundary CRS if needed
+    all_quads = all_quads.to_crs(boundary.crs)
+
+    # Get intersecting quads
+    quad_ids = get_quads(boundary, all_quads)
+    print(f"Found {len(quad_ids)} intersecting quads: {quad_ids}")
+
+    # Get the quad geometries that matched (for plotting)
+    matching_quads = all_quads[all_quads['CELL_MAPCODE'].apply(_cell_map_code).isin(quad_ids)]
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(10, 10))
+    matching_quads.plot(ax=ax, color="lightblue", edgecolor="blue", alpha=0.5, label="Quads")
+    boundary.plot(ax=ax, color="none", edgecolor="red", linewidth=2, label="Boundary")
+    ax.legend()
+    ax.set_title("Intersecting Quads and Project Boundary")
+    plt.show()
 # %%
