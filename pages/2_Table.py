@@ -131,14 +131,16 @@ if "editor_version" not in st.session_state:
 # ---------------------------------------------------------
 # FILTER / QUERY SOURCE DATA
 # ---------------------------------------------------------
-cnps_queried = st.session_state.cnps_raw[
-    st.session_state.cnps_raw["Quads"].str.contains(
-        "Boulder Peak (4112351)",
-        case=False,
-        na=False,
-        regex=False
-    )
-].copy()
+# cnps_queried = st.session_state.cnps_raw[
+#     st.session_state.cnps_raw["Quads"].str.contains(
+#         "Boulder Peak (4112351)",
+#         case=False,
+#         na=False,
+#         regex=False
+#     )
+# ].copy()
+
+cnps_queried = st.session_state.cnps_raw.copy()
 
 # For now, use full CNDDB test data as queried result
 cnddb_queried = st.session_state.cnddb_raw.copy()
