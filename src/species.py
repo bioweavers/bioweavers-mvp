@@ -8,6 +8,7 @@ import plotly.express as px
 import streamlit as st
 import pydeck as pdk
 import json
+import streamlit as st
 
 
 #%%
@@ -156,6 +157,11 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
     # Create copy of the boundary GeoDataFrame.
     clip_mask = boundary_wgs.copy()
 
+    # re-project geometries to a projected CRS before buffer operation
+    if st.session_state.DEBUG:
+        st.info("About to project clip_mask to crs")
+    
+    clip_mask.to_crs(epsg=4326)
     # Buffer the boundary by a small amount to ensure we capture species occurrences that are near the edge of the search area. 
     clip_mask['geometry'] = boundary_wgs.geometry.buffer(0.00001)  # polygonize if LineString
     

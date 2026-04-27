@@ -9,11 +9,16 @@ import numpy as np
 # import tempfile
 import json
 from pathlib import Path
-import streamlit as st
 import geopandas as gpd
 import json
 import pydeck as pdk
-import fiona
+from shapely.geometry import shape
+from shapely.ops import unary_union
+from shapely.geometry import mapping
+from shapely.geometry import Polygon
+
+st.session_state.DEBUG = True
+st.set_page_config(layout="wide")
 
 # Title of the page.
 st.title('Testing Export PTO functionality')
@@ -173,6 +178,11 @@ if uploaded_file is not None:
         else:
             # Reproject quads to match the search area CRS for accurate spatial intersection.
             all_quads_reproj = all_quads.to_crs(search_area.crs)
+
+            st.write("search_area bounds:", search_area.total_bounds)
+            st.write("search_area CRS:", search_area.crs)
+            st.write("search_area geometry:", search_area.geometry.values)
+
             # `Search_area` is a buffered polygon, find which quads intersect it.
             search_quad_ids = get_quads(search_area, all_quads_reproj)
 
@@ -181,6 +191,24 @@ if uploaded_file is not None:
 
         # Query CNPS dataset using the extracted quad IDs.    
         cnps_species = get_species_cnps(cnps, search_quad_ids)
+
+        # if "cnps_raw" not in st.session_state:
+        #     st.session_state.cnps_raw = pd.read_csv("app/data/CNPS_RAW.csv")
+
+        # if "cnddb_raw" not in st.session_state:
+        #     st.session_state.cnddb_raw = pd.read_csv("app/data/cnddb_test_data.csv")
+
+        if "editor_version" not in st.session_state:
+             st.session_state.editor_version = 0
+
+        st.session_state.cnps_raw = cnps_species
+        st.session_state.cnddb_raw = cnddb_species
+
+        st.session_state.editor_version += 1
+
+        st.session_state.search_area = search_area          # add this
+        st.session_state.project_boundary_gdf = project_boundary_gdf  # add this
+        st.session_state.results_ready = True               # add this
 
         # Display the results in tables.
         st.subheader("CNDDB Species Results")
@@ -197,7 +225,7 @@ if uploaded_file is not None:
         plot_species_map_streamlit(cnddb_species, search_area, project_boundary_gdf) 
 
         # Graph the number of CNDDB species occurrences .
-        st.subheader("CNDDB Species Occurrence Date Range")
+        st.subheader("CNDDB Species Occurrence")
         plot_cnddb_species_distribution_streamlit(cnddb_species)
 
 
