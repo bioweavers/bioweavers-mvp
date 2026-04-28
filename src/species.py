@@ -158,8 +158,8 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
     clip_mask = boundary_wgs.copy()
 
     # re-project geometries to a projected CRS before buffer operation
-    if st.session_state.DEBUG:
-        st.info("About to project clip_mask to crs")
+    # if st.session_state.DEBUG:
+        # st.info("About to project clip_mask to crs")
     
     clip_mask.to_crs(epsg=4326)
     # Buffer the boundary by a small amount to ensure we capture species occurrences that are near the edge of the search area. 
@@ -231,5 +231,5 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
         layers=layers,                                                                                      # Map the defined layers to the map.
         initial_view_state=view_state,                                                                      # Set the initial view state to center on the search area.
         map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",                          # Add a basemap.
-        tooltip={"text": "Species: {SNAME}\nCommon Name: {CNAME}\nNumber of Occurences: {OCCNUMBER}"}       # Configure tooltip to show species information on hover.
+        tooltip={"text": "Species: {SNAME}\nCommon Name: {CNAME}\nNumber of Occurences: {EOCOUNT}"}       # Configure tooltip to show species information on hover.
     ))
