@@ -18,19 +18,20 @@ def format_cnps(df):
         return join_lines(r['ScientificName'], r['CommonName'])
 
     def build_status_display(r):
-        # Left: Label
-        # Right: Column Name
-        mapping = {
-            'CRPR': 'CRPR',
-            'CESA': 'CESA',
-            'FESA': 'FESA',
-            'Other Status': 'OtherStatus'
-        }
-        parts = [
-            f"{label}: {r[col]}"
-            for col, label in mapping.items()
-            if pd.notna(r.get(col))
+
+        status_cols = [
+            'CRPR',
+            'CESA',
+            'FESA',
+            'OtherStatus'
         ]
+
+        parts = [
+            str(r[col]).strip()
+            for col in status_cols
+            if pd.notna(r.get(col)) and str(r.get(col)).strip()
+        ]
+
         return join_lines(*parts)
 
     def build_habitat_requirements(r):
@@ -58,8 +59,8 @@ def format_cnps(df):
 
         # Other habitat fields
         mapping = {
-            "BloomingPeriod": "Blooming Period", 
-            "Habitat": "Habitat"
+            "Habitat": "Habitat",
+            "BloomingPeriod": "Blooming Period"
         }
         parts.extend(
             f"{label}: {r[col]}"
@@ -183,6 +184,18 @@ editable_columns = [
 
 edited_combined = st.data_editor(
     combined_display[["_row_id"] + editable_columns],
+    column_config={
+        "_row_id": None,
+        "Source": None,
+        "SpeciesDisplay": st.column_config.TextColumn("Species Name", pinned=True),
+        "StatusDisplay": st.column_config.TextColumn("Status", width="medium"),
+        "HabitatRequirements": st.column_config.TextColumn("Habitat Requirements", width="large"),
+        "PotentialtoOccur": st.column_config.TextColumn("Potential to Occur", width="medium"),
+        "HabitatSuitabilityObservations": st.column_config.TextColumn(
+            "Habitat Suitability / Observations",
+            width="large"
+        )
+    },
     num_rows="dynamic",
     width="stretch",
     disabled=["_row_id", "Source", "SpeciesDisplay", "StatusDisplay", "HabitatRequirements"],
