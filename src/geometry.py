@@ -117,9 +117,10 @@ def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
     if st.session_state.DEBUG:
         st.info(f"\t Created a buffer around the geometries of the uploaded project boundary.")
 
-
+    # Reproject the buffered GeoDataFrame back to WGS84 (EPSG:4326) for consistency with other data layers.
+    gdf_buffered = gdf_buffered.to_crs(epsg=4326, inplace=False)
     # Return the buffered GeoDataFrame in the original CRS       
-    return gdf_buffered.to_crs(epsg=4326, inplace=True)
+    return gdf_buffered
 
 
 #%%

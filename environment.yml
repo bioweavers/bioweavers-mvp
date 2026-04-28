@@ -1,0 +1,26 @@
+name: bioweavers-mvp
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - geopandas
+  - shapely
+  - pandas
+  - numpy
+  - matplotlib
+  - requests
+  - openpyxl
+  - plotly
+  - pydeck
+  - streamlit
+  - streamlit-folium
+  - fastapi
+  - uvicorn
+  - python-docx
+  - docxtpl
+  - jupyter
+  - notebook
+  - ipykernel
+  - debugpy
+  - pytest
+  - setuptools<78
