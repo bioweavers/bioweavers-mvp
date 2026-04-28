@@ -5,6 +5,12 @@ from docxtpl import DocxTemplate
 
 #from ..app.utils.format_data import format_cnps, format_cnddb
 
+# Add title to the page.
+st.title('Export Results to Word')
+
+# Add header.
+st.header('Project Potential to Occur Table', divider=True)
+
 # Join non empty lines
 def join_lines(*parts):
     cleaned = [str(p).strip() for p in parts if pd.notna(p) and str(p).strip()]
@@ -131,14 +137,16 @@ if "editor_version" not in st.session_state:
 # ---------------------------------------------------------
 # FILTER / QUERY SOURCE DATA
 # ---------------------------------------------------------
-cnps_queried = st.session_state.cnps_raw[
-    st.session_state.cnps_raw["Quads"].str.contains(
-        "Boulder Peak (4112351)",
-        case=False,
-        na=False,
-        regex=False
-    )
-].copy()
+# cnps_queried = st.session_state.cnps_raw[
+#     st.session_state.cnps_raw["Quads"].str.contains(
+#         "Boulder Peak (4112351)",
+#         case=False,
+#         na=False,
+#         regex=False
+#     )
+# ].copy()
+
+cnps_queried = st.session_state.cnps_raw.copy()
 
 # For now, use full CNDDB test data as queried result
 cnddb_queried = st.session_state.cnddb_raw.copy()
