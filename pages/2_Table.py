@@ -5,6 +5,12 @@ from docxtpl import DocxTemplate
 
 #from ..app.utils.format_data import format_cnps, format_cnddb
 
+# Add title to the page.
+st.title('Export Results to Word')
+
+# Add header.
+st.header('Project Potential to Occur Table', divider=True)
+
 # Join non empty lines
 def join_lines(*parts):
     cleaned = [str(p).strip() for p in parts if pd.notna(p) and str(p).strip()]

@@ -16,12 +16,24 @@ from shapely.geometry import shape
 from shapely.ops import unary_union
 from shapely.geometry import mapping
 from shapely.geometry import Polygon
+import debugpy
+
+# Set up Streamlit app configuration and debugging.
+# The following code checks if a debug client is already connected. If not, it attempts to listen for debug connections on port 5678. This allows you to attach a debugger (e.g., from VS Code) to the Streamlit app for debugging purposes. The try-except block handles the case where the port might already be in use, which can happen in certain environments that don't support debugging.
+if not debugpy.is_client_connected():
+    try:
+        debugpy.listen(5678) # Listen for debug connections on port 5678.
+    except RuntimeError:
+        pass # Handle the case where the port is already in use (e.g., when running in an environment that doesn't support debugging).
 
 st.session_state.DEBUG = True
 st.set_page_config(layout="wide")
 
 # Title of the page.
-st.title('Testing Export PTO functionality')
+st.title('Landing Page')
+
+# View uploaded boundary.
+st.header("Upload Project Boundary", divider=True)
 
 # Import necessary functions from src modules.
 from src.geometry import _cell_map_code, load_boundary, create_buffer, get_bounding_box, load_all_quads, get_quads, get_species_cnps, get_species_cnddb, get_neighbors
@@ -43,13 +55,13 @@ cnddb = gpd.read_file(cnddb_path)
 
 # Create file upload button for user to upload their own boundary file (GeoJSON format).
 uploaded_file = st.file_uploader(
-    label="Upload project boundary file.",
+    label="Please upload the project boundary GeoJSON file.",
     type='geojson',
     accept_multiple_files=False,
     help="Drag and drop a .geojson file here, or click to browse.")
 
 # View uploaded boundary.
-st.header("Project Boundary Preview")
+st.header("Project Boundary Preview", divider=True)
 
 # If a file is uploaded, read it as a GeoDataFrame and display it on a map.
 if uploaded_file is not None:
@@ -98,7 +110,7 @@ if uploaded_file is not None:
     map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"))  # Add a basemap.
 
     # View project boundary with an applied buffer.
-    st.title("Applying Buffer Search")
+    st.header("Search Radius Criteria", divider=True)
 
     # Define buffer search options for `st.radio()`.
     buffer_option_names = ['2-Mile', '5-Mile', '10-Mile', '9-Quad']

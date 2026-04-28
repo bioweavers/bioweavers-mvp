@@ -89,31 +89,37 @@ def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
     
     # Set CRS to WGS84 (EPSG:4326) if not already set, and reproject if necessary.
     if gdf_buffered.crs is None:
-        gdf_buffered = gdf_buffered.set_crs(epsg=4326)
+        # Use inplace to set the CRS directly on the GeoDataFrame without creating a new object, 
+        # which avoids issues with chained assignments and ensures that the CRS is correctly 
+        # assigned to the original GeoDataFrame.
+        gdf_buffered.set_crs(epsg=4326, inplace=True)
     else:
-        gdf_buffered = gdf_buffered.to_crs(epsg=4326)
+        gdf_buffered.to_crs(epsg=4326, inplace=True)
 
     if st.session_state.DEBUG:
         st.info(f"\t Assigned gdf CRS. Current value: {gdf_buffered.crs}")
 
     # Set the CRS to the California Albers (EPSG:3310) 
-    gdf_buffered = gdf_buffered.to_crs(epsg=3310)
+    #gdf_test = gdf_buffered.to_crs(epsg=3310, inplace=False)
+    gdf_test = gdf_buffered.to_crs(crs="EPSG:3310", inplace=False)
 
     if st.session_state.DEBUG:
         st.info(f"\t CRS is {gdf_buffered.crs} which should be the CRS to California Albers (EPSG:3310)")
 
     # Create a buffer around the geometries in the GeoDataFrame
-    gdf_buffered['geometry'] = gdf_buffered.geometry.buffer(distance)
+    try:
+        st.info(f"Running gdf_final.geometry.buffer with {distance} meters...")
+        gdf_buffered['geometry'] = gdf_test.geometry.buffer(distance)
+    except Exception as e:
+        st.info(f"Error creating buffer: {e}")
+    
 
     if st.session_state.DEBUG:
         st.info(f"\t Created a buffer around the geometries of the uploaded project boundary.")
 
 
-    # Return the buffered GeoDataFrame in the original CRS
-    gdf_buffered = gdf_buffered.to_crs(epsg=4326)
-
-       
-    return gdf_buffered
+    # Return the buffered GeoDataFrame in the original CRS       
+    return gdf_buffered.to_crs(epsg=4326, inplace=True)
 
 
 #%%
