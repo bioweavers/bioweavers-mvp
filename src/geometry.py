@@ -107,10 +107,10 @@ def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
         st.info(f"\t CRS is {gdf_buffered.crs} which should be the CRS to California Albers (EPSG:3310)")
 
     # Create a buffer around the geometries in the GeoDataFrame
-    try:
+    #try:
         st.info(f"Running gdf_final.geometry.buffer with {distance} meters...")
         gdf_buffered['geometry'] = gdf_test.geometry.buffer(distance)
-    except Exception as e:
+    #except Exception as e:
         st.info(f"Error creating buffer: {e}")
     
 
