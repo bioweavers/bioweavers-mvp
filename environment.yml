@@ -3,24 +3,32 @@ channels:
   - conda-forge
 dependencies:
   - python=3.11
-  - geopandas
-  - shapely
+  # geospatial C-stack — pin majors to avoid ABI mismatches
+  - geopandas>=1.0
+  - shapely>=2.0
+  - pyproj>=3.6
+  - pyogrio>=0.7
+  # data + viz
   - pandas
   - numpy
   - matplotlib
-  - requests
-  - openpyxl
   - plotly
   - pydeck
+  # web
   - streamlit
   - streamlit-folium
   - fastapi
   - uvicorn
+  - requests
+  # docs
   - python-docx
   - docxtpl
+  - openpyxl
+  - setuptools<78  # docxcompose uses removed pkg_resources
+  # dev
   - jupyter
   - notebook
   - ipykernel
   - debugpy
   - pytest
-  - setuptools<78
+  
