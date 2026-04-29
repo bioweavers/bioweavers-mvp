@@ -17,6 +17,8 @@ from shapely.ops import unary_union
 from shapely.geometry import mapping
 from shapely.geometry import Polygon
 import debugpy
+import tempfile
+import os
 
 # Set up Streamlit app configuration and debugging.
 # The following code checks if a debug client is already connected. If not, it attempts to listen for debug connections on port 5678. This allows you to attach a debugger (e.g., from VS Code) to the Streamlit app for debugging purposes. The try-except block handles the case where the port might already be in use, which can happen in certain environments that don't support debugging.
@@ -70,9 +72,6 @@ if uploaded_file is not None:
     run_buffer = False  
 
     # Read the uploaded GeoJSON file into a GeoDataFrame.
-    import tempfile
-    import os
-
     with tempfile.NamedTemporaryFile(delete=False, suffix=".geojson") as tmp:
      tmp.write(uploaded_file.read())
      tmp_path = tmp.name
@@ -80,8 +79,8 @@ if uploaded_file is not None:
     project_boundary_gdf = gpd.read_file(tmp_path)
     os.unlink(tmp_path)
 
-    st.info(f"Loaded GeoDataFrame: {project_boundary_gdf.crs}")
-    st.info(f"Geometry: {project_boundary_gdf.geometry.values}")
+    #st.info(f"Loaded GeoDataFrame: {project_boundary_gdf.crs}")
+    #st.info(f"Geometry: {project_boundary_gdf.geometry.values}")
 
     # Set CRS to WGS84 (EPSG:4326) if not already set, and reproject if necessary.
     if project_boundary_gdf.crs is None:
@@ -202,9 +201,9 @@ if uploaded_file is not None:
             # Reproject quads to match the search area CRS for accurate spatial intersection.
             all_quads_reproj = all_quads.to_crs(search_area.crs)
 
-            st.write("search_area bounds:", search_area.total_bounds)
-            st.write("search_area CRS:", search_area.crs)
-            st.write("search_area geometry:", search_area.geometry.values)
+            #st.write("search_area bounds:", search_area.total_bounds)
+            #st.write("search_area CRS:", search_area.crs)
+            #st.write("search_area geometry:", search_area.geometry.values)
 
             # `Search_area` is a buffered polygon, find which quads intersect it.
             search_quad_ids = get_quads(search_area, all_quads_reproj)
@@ -233,23 +232,23 @@ if uploaded_file is not None:
         st.session_state.project_boundary_gdf = project_boundary_gdf  # add this
         st.session_state.results_ready = True               # add this
 
-        # Display the results in tables.
-        st.subheader("CNDDB Species Results")
-        st.write(f"Found {len(cnddb_species)} species occurrences")
-        st.dataframe(cnddb_species.drop(columns='geometry'))
+        # # Display the results in tables.
+        # st.subheader("CNDDB Species Results")
+        # st.write(f"Found {len(cnddb_species)} species occurrences")
+        # st.dataframe(cnddb_species.drop(columns='geometry'))
 
-        # Display the results in tables.
-        st.subheader("CNPS Species Results")
-        st.write(f"Found {len(cnps_species)} species occurrences")
-        st.dataframe(cnps_species)
+        # # Display the results in tables.
+        # st.subheader("CNPS Species Results")
+        # st.write(f"Found {len(cnps_species)} species occurrences")
+        # st.dataframe(cnps_species)
 
-        # Map CNDDB species occurrences within the project boundary.
-        st.subheader("CNDDB Species Map")
-        plot_species_map_streamlit(cnddb_species, search_area, project_boundary_gdf) 
+        # # Map CNDDB species occurrences within the project boundary.
+        # st.subheader("CNDDB Species Map")
+        # plot_species_map_streamlit(cnddb_species, search_area, project_boundary_gdf) 
 
-        # Graph the number of CNDDB species occurrences .
-        st.subheader("CNDDB Species Occurrence")
-        plot_cnddb_species_distribution_streamlit(cnddb_species)
+        # # Graph the number of CNDDB species occurrences .
+        # st.subheader("CNDDB Species Occurrence")
+        # plot_cnddb_species_distribution_streamlit(cnddb_species)
 
 
 
