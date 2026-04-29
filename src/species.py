@@ -163,7 +163,7 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
     
     clip_mask.to_crs(epsg=4326)
     # Buffer the boundary by a small amount to ensure we capture species occurrences that are near the edge of the search area. 
-    clip_mask['geometry'] = boundary_wgs.geometry.buffer(0.00001)  # polygonize if LineString
+    clip_mask['geometry'] = boundary_wgs.geometry.buffer(0.00001)
     
     # Clip the species occurrences to the buffered boundary to focus on the area of interest.
     cnddb_clipped = gpd.clip(cnddb_wgs, clip_mask)
