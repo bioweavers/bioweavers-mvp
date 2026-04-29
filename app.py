@@ -70,7 +70,18 @@ if uploaded_file is not None:
     run_buffer = False  
 
     # Read the uploaded GeoJSON file into a GeoDataFrame.
-    project_boundary_gdf = gpd.read_file(uploaded_file)
+    import tempfile
+    import os
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".geojson") as tmp:
+     tmp.write(uploaded_file.read())
+     tmp_path = tmp.name
+
+    project_boundary_gdf = gpd.read_file(tmp_path)
+    os.unlink(tmp_path)
+
+    st.info(f"Loaded GeoDataFrame: {project_boundary_gdf.crs}")
+    st.info(f"Geometry: {project_boundary_gdf.geometry.values}")
 
     # Set CRS to WGS84 (EPSG:4326) if not already set, and reproject if necessary.
     if project_boundary_gdf.crs is None:
@@ -125,7 +136,7 @@ if uploaded_file is not None:
 
     if run_buffer:  # only runs when clicked
         if buffer_choice == '2-Mile':
-            distance = 4828.03
+            distance = 3218.69
             search_area = create_buffer(project_boundary_gdf, distance)
         elif buffer_choice == '5-Mile':
             distance = 8046.72
@@ -146,7 +157,7 @@ if uploaded_file is not None:
         search_area_wgs = search_area.to_crs(epsg=4326)
 
         # Convert search area GeoDataFrame to GeoJSON format for pydeck.
-        geojson_search = json.loads(search_area.to_json())
+        geojson_search = json.loads(search_area_wgs.to_json())
 
         # Calculate the center of the search area for initial map view.
         minx, miny, maxx, maxy = search_area_wgs.total_bounds
