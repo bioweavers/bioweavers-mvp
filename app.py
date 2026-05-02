@@ -35,7 +35,7 @@ st.set_page_config(layout="wide")
 st.title('Landing Page')
 
 # View uploaded boundary.
-st.header("Upload Project Boundary", divider=True)
+st.header("Upload Project Boundary", divider="blue")
 
 # Import necessary functions from src modules.
 from src.geometry import _cell_map_code, load_boundary, create_buffer, get_bounding_box, load_all_quads, get_quads, get_species_cnps, get_species_cnddb, get_neighbors
@@ -62,8 +62,19 @@ uploaded_file = st.file_uploader(
     accept_multiple_files=False,
     help="Drag and drop a .geojson file here, or click to browse.")
 
+# Save to session state only when a new file is uploaded.
+if uploaded_file is not None:
+    st.session_state.uploaded_boundary = uploaded_file.getvalue()
+    st.session_state.uploaded_boundary_name = uploaded_file.name
+
+# Restore from session state if user navigated away and came back to page 1.
+elif "uploaded_boundary" in st.session_state:
+    import io
+    uploaded_file = io.BytesIO(st.session_state.uploaded_boundary)
+    uploaded_file.name = st.session_state.uploaded_boundary_name
+
 # View uploaded boundary.
-st.header("Project Boundary Preview", divider=True)
+st.header("Project Boundary Preview", divider="grey")
 
 # If a file is uploaded, read it as a GeoDataFrame and display it on a map.
 if uploaded_file is not None:
@@ -78,6 +89,9 @@ if uploaded_file is not None:
 
     project_boundary_gdf = gpd.read_file(tmp_path)
     os.unlink(tmp_path)
+
+    # After creating project_boundary_gdf, save it
+    st.session_state.project_boundary_gdf = project_boundary_gdf
 
     #st.info(f"Loaded GeoDataFrame: {project_boundary_gdf.crs}")
     #st.info(f"Geometry: {project_boundary_gdf.geometry.values}")
@@ -103,7 +117,7 @@ if uploaded_file is not None:
     pickable=True,
     stroked=True,
     filled=False,                
-    get_line_color="'#B22222'",  # FIND A BETTER COLOR OR A WAY TO IMPLEMENT A COLOR
+    get_line_color="'#B22222'",  # Boundary defined by black line.
     line_width_min_pixels=2)     # Ensures line is visible at any zoom.)
 
     # Set the initial view state of the map to center on the boundary.
@@ -120,7 +134,7 @@ if uploaded_file is not None:
     map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"))  # Add a basemap.
 
     # View project boundary with an applied buffer.
-    st.header("Search Radius Criteria", divider=True)
+    st.header("Search Radius Criteria", divider="grey")
 
     # Define buffer search options for `st.radio()`.
     buffer_option_names = ['2-Mile', '5-Mile', '10-Mile', '9-Quad']
@@ -167,11 +181,11 @@ if uploaded_file is not None:
         buffer_layer = pdk.Layer(
             type="GeoJsonLayer",
             data=geojson_search,
-            stroked=True,                           # Display the boundary of the buffer.
+            stroked=True,                               # Display the boundary of the buffer.
             filled=True,
-            get_fill_color=[0, 140, 255, 80],       # Fill color of the buffer.
-            get_line_color=[0, 0, 255],             # Line color of the buffer boundary.
-            line_width_min_pixels=1,                # Minimum line width to ensure visibility at all zoom levels.
+            get_fill_color=[108, 173, 191, 80],         # Fill color of the buffer.
+            get_line_color=[108, 173, 191],             # Line color of the buffer boundary.
+            line_width_min_pixels=1,                    # Minimum line width to ensure visibility at all zoom levels.
         )
 
         # Set the initial view state of the map to center on the search area.
@@ -231,6 +245,8 @@ if uploaded_file is not None:
         st.session_state.search_area = search_area          # add this
         st.session_state.project_boundary_gdf = project_boundary_gdf  # add this
         st.session_state.results_ready = True               # add this
+
+        st.page_link("pages/1_Results.py", label="Go to Results", width='stretch')
 
         # # Display the results in tables.
         # st.subheader("CNDDB Species Results")

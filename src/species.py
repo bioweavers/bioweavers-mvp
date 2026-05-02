@@ -57,11 +57,37 @@ def plot_cnddb_species_distribution(df):
 # %%
 # Create a function to plot the distribution of CNDDB species occurrences in Streamlit.
 def plot_cnddb_species_distribution_streamlit(df):
-    chart_data = df.drop(columns='geometry').sort_values('OCCNUMBER', ascending=False)
-    st.bar_chart(
+    # chart_data = df.drop(columns='geometry').sort_values('EOCOUNT', ascending=False)
+    # st.bar_chart(
+    #     chart_data,
+    #     x='SNAME',
+    #     y='EOCOUNT')
+
+    chart_data = df.drop(columns='geometry')
+    chart_data = chart_data.groupby('SNAME', as_index=False)['EOCOUNT'].sum()  # aggregate duplicates
+    chart_data = chart_data.sort_values('EOCOUNT', ascending=False)
+    
+    fig = px.bar(
         chart_data,
-        x='SNAME',
-        y='OCCNUMBER')
+        x='EOCOUNT',
+        y='SNAME',
+        category_orders={'SNAME': chart_data['SNAME'].tolist()},  # enforces sort order
+        color_discrete_sequence=['#375673'],  # bar color
+        labels={
+            'EOCOUNT': "Species Occurrence Count",
+            'SNAME': 'Scientific Name'
+        }
+    )
+    
+    fig.update_layout(
+        font_family='Roboto',
+        font_color='#333333',
+        plot_bgcolor='white',
+        yaxis=dict(gridcolor='#eeeeee'),
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+
 
 
 #%%
@@ -181,8 +207,8 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
         data=cnddb_clipped, 
         stroked=True,           # Outline the polygons.
         filled=True,            # Fill the polygons with color.
-        get_fill_color=[255, 140, 0, 150],
-        get_line_color=[255, 140, 0],
+        get_fill_color=[253, 161, 106, 150],
+        get_line_color=[253, 161, 106],
         line_width_min_pixels=1,
         pickable=True,
     )
@@ -193,8 +219,8 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
         data=boundary_wgs,
         stroked=True,
         filled=True,
-        get_fill_color=[0, 140, 255, 40],
-        get_line_color=[0, 0, 255],
+        get_fill_color=[108, 173, 191, 80],
+        get_line_color=[108, 173, 191],
         line_width_min_pixels=2,
     )
 
@@ -204,7 +230,7 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
             data=project_boundary_gdf.to_crs(epsg=4326),
             stroked=True,
             filled=False,
-            get_line_color=[178, 34, 34],
+            get_line_color="'#B22222'",
             line_width_min_pixels=2,
         )
 
@@ -231,5 +257,25 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
         layers=layers,                                                                                      # Map the defined layers to the map.
         initial_view_state=view_state,                                                                      # Set the initial view state to center on the search area.
         map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",                          # Add a basemap.
-        tooltip={"text": "Species: {SNAME}\nCommon Name: {CNAME}\nNumber of Occurences: {EOCOUNT}"}       # Configure tooltip to show species information on hover.
+        tooltip={
+    "html": "<b>{SNAME}</b> ({CNAME})<br/>"
+            "<b>ELMCODE:</b> {ELMCODE}<br/>"
+            "<b>OCCNUMBER:</b> {OCCNUMBER}<br/>"
+            "<b>ELEVATION:</b> {ELEVATION}<br/>"
+            "<b>PRESENCE:</b> {PRESENCE}<br/>"
+            "<b>ELMDATE:</b> {ELMDATE}<br/>"
+            "<b>LOCATION:</b> {LOCATION}<br/>"
+            "<b>LOCDETAILS:</b> {LOCDETAILS}<br/>"
+            "<b>ECOLOGICAL:</b> {ECOLOGICAL}<br/>"
+            "<b>GENERAL:</b> {GENERAL}<br/>"
+            "<b>LASTUPDATE:</b> {LASTUPDATE}",
+    "style": {
+        "fontSize": "11px",
+        "maxWidth": "300px",
+        "backgroundColor": "rgba(52,61,78,0.75)",
+        "color": "white",
+        "padding": "8px",
+        "borderRadius": "4px",
+    }
+}       # Configure tooltip to show species information on hover.
     ))
