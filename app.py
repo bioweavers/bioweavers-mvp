@@ -226,6 +226,13 @@ if uploaded_file is not None:
         st.session_state.cnps_raw = cnps_species
         st.session_state.cnddb_raw = cnddb_species
 
+# -------------------------------------------------------------------------
+        # prevent the Table page from exporting an old or mismatched PTO table after a new buffer search.
+        for key in ["formatted_cnps", "formatted_cnddb", "combined_pto", "pto_editor"]:
+            if key in st.session_state:
+                del st.session_state[key]
+# -------------------------------------------------------------------------
+
         st.session_state.editor_version += 1
 
         st.session_state.search_area = search_area          # add this
