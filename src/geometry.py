@@ -373,3 +373,58 @@ if __name__ == "__main__":
     ax.set_title("Intersecting Quads and Project Boundary")
     plt.show()
 # %%
+
+import geopandas as gpd
+from pyproj import CRS
+
+def safe_to_crs(gdf: gpd.GeoDataFrame, target_epsg: int) -> gpd.GeoDataFrame:
+    """to_crs with explicit checks for the four ways it silently produces garbage."""
+    n = len(gdf)
+    if n == 0:
+        raise ValueError("Input GeoDataFrame is empty.")
+
+    # 1. Source CRS must be set. set_crs only labels — if it's wrong, every downstream call lies.
+    if gdf.crs is None:
+        raise ValueError(
+            "Source GeoDataFrame has no CRS. Use set_crs() to label it before reprojecting, "
+            "but only if you know what CRS the coordinates are actually in."
+        )
+
+    # 2. Input geometries must be non-null and non-empty.
+    n_null = gdf.geometry.isna().sum()
+    n_empty = gdf.geometry.is_empty.sum()
+    if n_null or n_empty:
+        raise ValueError(
+            f"Input has {n_null} null and {n_empty} empty geometries (of {n}). "
+            "Drop or repair these before reprojecting."
+        )
+
+    # 3. Input bounds must lie within the target CRS's area of use.
+    target = CRS.from_epsg(target_epsg)
+    if target.area_of_use is not None:
+        w, s, e, n_ = target.area_of_use.bounds  # always lon/lat
+        bounds_4326 = gdf.to_crs(epsg=4326).total_bounds
+        xmin, ymin, xmax, ymax = bounds_4326
+        outside = not (xmin >= w and ymin >= s and xmax <= e and ymax <= n_)
+        if outside:
+            raise ValueError(
+                f"Input bounds [{xmin:.3f}, {ymin:.3f}, {xmax:.3f}, {ymax:.3f}] "
+                f"extend outside EPSG:{target_epsg} area of use [{w:.3f}, {s:.3f}, {e:.3f}, {n_:.3f}]. "
+                "Reprojection will produce empty or invalid geometries. "
+                "Use a CRS whose area of use covers your data."
+            )
+
+    # 4. Do the reprojection and validate the output.
+    out = gdf.to_crs(epsg=target_epsg)
+    out_null = out.geometry.isna().sum()
+    out_empty = out.geometry.is_empty.sum()
+    out_invalid = (~out.geometry.is_valid).sum()
+    if out_null or out_empty or out_invalid:
+        raise RuntimeError(
+            f"to_crs(epsg={target_epsg}) silently produced "
+            f"{out_null} null, {out_empty} empty, {out_invalid} invalid geometries "
+            f"out of {n}. Likely causes: source CRS mislabeled, geometries crossing "
+            f"the antimeridian, or PROJ falling back to a ballpark transformation."
+        )
+
+    return out
