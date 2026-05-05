@@ -1,0 +1,85 @@
+`========================================================================================================== test session starts ==========================================================================================================
+platform darwin -- Python 3.11.15, pytest-9.0.3, pluggy-1.6.0 -- /Users/kellycaylor/mambaforge/envs/bioweavers-gdf/bin/python3.11
+cachedir: .pytest_cache
+geo-stack: geopandas 1.1.3 | shapely 2.1.2 (GEOS 3.14.1) | pyproj 3.7.2 (PROJ 9.8.1) | pyogrio 0.12.1
+conda env: bioweavers-gdf
+rootdir: /Users/kellycaylor/dev
+configfile: pyproject.toml
+plugins: anyio-4.13.0
+collected 63 items                                                                                                                                                                                                                      
+
+app/tests/test_format_cnddb.py::test_returns_dataframe_with_expected_columns PASSED                                                                                                                                               [  1%]
+app/tests/test_format_cnddb.py::test_one_row_in_one_row_out PASSED                                                                                                                                                                [  3%]
+app/tests/test_format_cnddb.py::test_source_marker_is_cnddb PASSED                                                                                                                                                                [  4%]
+app/tests/test_format_cnddb.py::test_potential_to_occur_columns_start_empty PASSED                                                                                                                                                [  6%]
+app/tests/test_format_cnddb.py::test_species_display_combines_sname_and_cname PASSED                                                                                                                                              [  7%]
+app/tests/test_format_cnddb.py::test_species_display_omits_missing_common_name PASSED                                                                                                                                             [  9%]
+app/tests/test_format_cnddb.py::test_status_display_uses_friendly_labels PASSED                                                                                                                                                   [ 11%]
+app/tests/test_format_cnddb.py::test_status_display_omits_missing_listings PASSED                                                                                                                                                 [ 12%]
+app/tests/test_format_cnddb.py::test_status_display_blank_when_all_listings_missing PASSED                                                                                                                                        [ 14%]
+app/tests/test_format_cnddb.py::test_status_display_lines_are_newline_separated PASSED                                                                                                                                            [ 15%]
+app/tests/test_format_cnddb.py::test_habitat_uses_ecological_field PASSED                                                                                                                                                         [ 17%]
+app/tests/test_format_cnddb.py::test_habitat_blank_when_ecological_missing PASSED                                                                                                                                                 [ 19%]
+app/tests/test_format_cnddb.py::test_habitat_blank_when_ecological_empty_string PASSED                                                                                                                                            [ 20%]
+app/tests/test_format_cnddb.py::test_handles_multiple_rows PASSED                                                                                                                                                                 [ 22%]
+app/tests/test_format_cnps.py::test_returns_dataframe_with_expected_columns PASSED                                                                                                                                                [ 23%]
+app/tests/test_format_cnps.py::test_one_row_in_one_row_out PASSED                                                                                                                                                                 [ 25%]
+app/tests/test_format_cnps.py::test_source_marker_is_cnps PASSED                                                                                                                                                                  [ 26%]
+app/tests/test_format_cnps.py::test_potential_to_occur_columns_start_empty PASSED                                                                                                                                                 [ 28%]
+app/tests/test_format_cnps.py::test_species_display_combines_scientific_and_common PASSED                                                                                                                                         [ 30%]
+app/tests/test_format_cnps.py::test_species_display_omits_blank_common_name PASSED                                                                                                                                                [ 31%]
+app/tests/test_format_cnps.py::test_status_display_includes_present_listings PASSED                                                                                                                                               [ 33%]
+app/tests/test_format_cnps.py::test_status_display_omits_missing_listings PASSED                                                                                                                                                  [ 34%]
+app/tests/test_format_cnps.py::test_status_display_lines_are_newline_separated PASSED                                                                                                                                             [ 36%]
+app/tests/test_format_cnps.py::test_status_display_includes_other_status XFAIL (format_cnps mapping for OtherStatus is reversed: dict is {‘Other Status’: ‘OtherStatus’} but the loop reads it as {column: label}, so it trie...) [ 38%]
+app/tests/test_format_cnps.py::test_habitat_includes_full_elevation_range PASSED                                                                                                                                                  [ 39%]
+app/tests/test_format_cnps.py::test_habitat_handles_only_low_elevation PASSED                                                                                                                                                     [ 41%]
+app/tests/test_format_cnps.py::test_habitat_handles_only_high_elevation PASSED                                                                                                                                                    [ 42%]
+app/tests/test_format_cnps.py::test_habitat_omits_elevation_when_both_missing PASSED                                                                                                                                              [ 44%]
+app/tests/test_format_cnps.py::test_habitat_includes_microhabitat_when_present PASSED                                                                                                                                             [ 46%]
+app/tests/test_format_cnps.py::test_habitat_combines_both_microhabitat_columns PASSED                                                                                                                                             [ 47%]
+app/tests/test_format_cnps.py::test_habitat_includes_blooming_and_habitat_text PASSED                                                                                                                                             [ 49%]
+app/tests/test_format_cnps.py::test_habitat_blank_when_all_fields_missing PASSED                                                                                                                                                  [ 50%]
+app/tests/test_format_cnps.py::test_handles_multiple_rows PASSED                                                                                                                                                                  [ 52%]
+tests/gigi_pto_test.py::test_build_cnps_records_full_row PASSED                                                                                                                                                                   [ 53%]
+tests/gigi_pto_test.py::test_build_cnps_records_falls_back_on_missing_fields PASSED                                                                                                                                               [ 55%]
+tests/gigi_pto_test.py::test_build_cnddb_records PASSED                                                                                                                                                                           [ 57%]
+tests/gigi_pto_test.py::test_record_shapes_match_between_sources PASSED                                                                                                                                                           [ 58%]
+tests/gigi_pto_test.py::test_generate_pto_document_writes_nonempty_docx SKIPPED (PTO template not found at /Users/kellycaylor/dev/bioweavers-mvp/src/pto_template2.docx)                                                          [ 60%]
+tests/gigi_pto_test.py::test_end_to_end_pto_generation_from_real_data SKIPPED (PTO template not found at /Users/kellycaylor/dev/bioweavers-mvp/src/pto_template2.docx)                                                            [ 61%]
+tests/test_environment.py::test_geopandas_minimum_version PASSED                                                                                                                                                                  [ 63%]
+tests/test_environment.py::test_shapely_minimum_version PASSED                                                                                                                                                                    [ 65%]
+tests/test_environment.py::test_pyproj_minimum_version PASSED                                                                                                                                                                     [ 66%]
+tests/test_environment.py::test_pyogrio_available_and_recent PASSED                                                                                                                                                               [ 68%]
+tests/test_environment.py::test_proj_data_dir_exists PASSED                                                                                                                                                                       [ 69%]
+tests/test_environment.py::test_proj_db_is_findable PASSED                                                                                                                                                                        [ 71%]
+tests/test_environment.py::test_to_crs_produces_finite_coordinates PASSED                                                                                                                                                         [ 73%]
+tests/test_environment.py::test_to_crs_agrees_with_pyproj_transformer PASSED                                                                                                                                                      [ 74%]
+tests/test_environment.py::test_to_crs_roundtrip_preserves_coordinates PASSED                                                                                                                                                     [ 76%]
+tests/test_environment.py::test_to_crs_preserves_polygon_topology PASSED                                                                                                                                                          [ 77%]
+tests/test_environment.py::test_print_environment_summary PASSED                                                                                                                                                                  [ 79%]
+tests/test_geometry.py::test_get_bounding_box PASSED                                                                                                                                                                              [ 80%]
+tests/test_geometry.py::test_get_quads PASSED                                                                                                                                                                                     [ 82%]
+tests/test_geometry.py::test_get_species_cnps PASSED                                                                                                                                                                              [ 84%]
+tests/test_geometry.py::test_get_species_cnddb PASSED                                                                                                                                                                             [ 85%]
+tests/test_to_crs.py::test_reprojects_california_to_3310 PASSED                                                                                                                                                                   [ 87%]
+tests/test_to_crs.py::test_reprojects_sample_boundary_to_3310 SKIPPED (sample boundary not found at /Users/kellycaylor/dev/bioweavers-mvp/fixtures/sample_boundary.geojson)                                                       [ 88%]
+tests/test_to_crs.py::test_roundtrip_preserves_geometry PASSED                                                                                                                                                                    [ 90%]
+tests/test_to_crs.py::test_raises_on_empty_gdf PASSED                                                                                                                                                                             [ 92%]
+tests/test_to_crs.py::test_raises_on_missing_crs PASSED                                                                                                                                                                           [ 93%]
+tests/test_to_crs.py::test_raises_on_null_geometry PASSED                                                                                                                                                                         [ 95%]
+tests/test_to_crs.py::test_raises_on_empty_geometry PASSED                                                                                                                                                                        [ 96%]
+tests/test_to_crs.py::test_raises_when_bounds_outside_area_of_use PASSED                                                                                                                                                          [ 98%]
+tests/test_to_crs.py::test_texas_reprojects_cleanly_to_5070 PASSED                                                                                                                                                                [100%]
+
+=========================================================================================================== warnings summary ============================================================================================================
+../../mambaforge/envs/bioweavers-gdf/lib/python3.11/site-packages/docxcompose/properties.py:18
+  /Users/kellycaylor/mambaforge/envs/bioweavers-gdf/lib/python3.11/site-packages/docxcompose/properties.py:18: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+    import pkg_resources
+
+bioweavers-mvp/tests/test_to_crs.py::test_raises_on_missing_crs
+  /Users/kellycaylor/mambaforge/envs/bioweavers-gdf/lib/python3.11/site-packages/pandas/core/generic.py:6220: DeprecationWarning: Overriding the CRS of a GeoDataFrame that already has CRS. This unsafe behavior will be deprecated in future versions. Use GeoDataFrame.set_crs method instead
+    return object.__setattr__(self, name, value)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+========================================================================================= 59 passed, 3 skipped, 1 xfailed, 2 warnings in 2.14s ==========================================================================================
