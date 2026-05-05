@@ -160,7 +160,8 @@ if uploaded_file is not None:
             all_quads = all_quads.to_crs(st.session_state.project_boundary_gdf.crs)
             quad_ids = get_quads(st.session_state.project_boundary_gdf, all_quads)
             buffer_quad_search = get_neighbors(quad_ids, all_quads)
-            st.session_state.search_area = all_quads[all_quads['CELL_MAPCODE'].apply(_cell_map_code).isin(buffer_quad_search)]
+            search_area = all_quads[all_quads['CELL_MAPCODE'].apply(_cell_map_code).isin(buffer_quad_search)]
+            st.session_state.search_area = search_area
 
     # Display the search area on a map using pydeck.
     if search_area is not None:
