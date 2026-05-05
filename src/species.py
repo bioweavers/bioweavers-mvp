@@ -250,8 +250,6 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
     # Define the layers.
     layers = [buffer_layer, species_layer, boundary_layer]
 
-    # st.write(cnddb_clipped.head())
-
     # Map species, project boundary, and buffered search area layers using PyDeck.
     st.pydeck_chart(pdk.Deck(
         layers=layers,                                                                                      # Map the defined layers to the map.

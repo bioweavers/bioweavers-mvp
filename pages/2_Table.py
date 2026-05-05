@@ -1,3 +1,4 @@
+# Import necessary libraries.
 import pandas as pd
 import streamlit as st
 from io import BytesIO
@@ -9,7 +10,7 @@ from docxtpl import DocxTemplate
 st.title('Export Results to Word')
 
 # Add header.
-st.header('Project Potential to Occur Table', divider=True)
+st.header('Project Potential to Occur Table', divider="blue")
 
 # Join non empty lines
 def join_lines(*parts):
@@ -124,47 +125,68 @@ def format_cnddb(df):
 # ---------------------------------------------------------
 # INITIALIZE SESSION STATE / LOAD RAW DATA
 # ---------------------------------------------------------
-if "cnps_raw" not in st.session_state:
-    st.session_state.cnps_raw = pd.read_csv("app/data/CNPS_RAW.csv")
+# if "cnps_raw" not in st.session_state:
+#     st.session_state.cnps_raw = pd.read_csv("app/data/CNPS_RAW.csv")
 
-if "cnddb_raw" not in st.session_state:
-    st.session_state.cnddb_raw = pd.read_csv("app/data/cnddb_test_data.csv")
+# if "cnddb_raw" not in st.session_state:
+#     st.session_state.cnddb_raw = pd.read_csv("app/data/cnddb_test_data.csv")
 
-if "editor_version" not in st.session_state:
-    st.session_state.editor_version = 0
+# if "editor_version" not in st.session_state:
+#     st.session_state.editor_version = 0
     
 
 # ---------------------------------------------------------
 # FILTER / QUERY SOURCE DATA
 # ---------------------------------------------------------
-# cnps_queried = st.session_state.cnps_raw[
-#     st.session_state.cnps_raw["Quads"].str.contains(
-#         "Boulder Peak (4112351)",
-#         case=False,
-#         na=False,
-#         regex=False
-#     )
-# ].copy()
 
-cnps_queried = st.session_state.cnps_raw.copy()
+# cnps_queried = st.session_state.cnps_raw.copy()
 
-# For now, use full CNDDB test data as queried result
-cnddb_queried = st.session_state.cnddb_raw.copy()
+# # For now, use full CNDDB test data as queried result
+# cnddb_queried = st.session_state.cnddb_raw.copy()
+
+# Guard: stop the page from loading if the user hasn't run a search yet on the Landing Page.
+# `results_ready` is set to True in page 1 after the buffer is applied and data is queried.
+if not st.session_state.get("results_ready", False):
+    st.warning("Please upload a boundary and apply a buffer on Page 1 first.")
+    st.stop() # Halts execution of the rest of the page.
+
+# Safety check: ensure `editor_version` exists in session state before reading it.
+# This key is normally set by page 1, but this prevents a KeyError if page 3 is accessed unexpectedly.
+if "editor_version" not in st.session_state:
+    st.session_state.editor_version = 0
+
+# Retrieve the editor version that page 3 last processed.
+# Defaults to -1 so it never matches a real version on first load, forcing a format on first visit.
+last_seen = st.session_state.get("last_editor_version", -1)
+
+# Retrieve the current editor version, which page 1 increments every time a new search is run.
+current_version = st.session_state.editor_version
+
+# Only reformat the tables if the search has been updated since page 3 last ran.
+# If versions match, the user just navigated back — preserve their edits to PotentialtoOccur etc.
+# If versions differ, a new search was run — rebuild the table from the fresh filtered data.
+if last_seen != current_version:
+     # Reformat CNPS data from the filtered results saved by page 1.
+    st.session_state.formatted_cnps = format_cnps(st.session_state.cnps_raw.copy())
+    # Reformat CNDDB data from the filtered results saved by page 1.
+    st.session_state.formatted_cnddb = format_cnddb(st.session_state.cnddb_raw.copy())
+    # Update the last seen version so we don't reformat again until the next new search.
+    st.session_state.last_editor_version = current_version
 
 # ---------------------------------------------------------
 # TRANSFORM RAW DATA INTO CLIENT-FACING FORMAT
 # ---------------------------------------------------------
-formatted_cnps = format_cnps(cnps_queried).copy()
-formatted_cnddb = format_cnddb(cnddb_queried).copy()
+# formatted_cnps = format_cnps(cnps_queried).copy()
+# formatted_cnddb = format_cnddb(cnddb_queried).copy()
 
 # ---------------------------------------------------------
 # STORE FORMATTED TABLES IN SESSION STATE
 # ---------------------------------------------------------
-if "formatted_cnps" not in st.session_state:
-    st.session_state.formatted_cnps = formatted_cnps
+# if "formatted_cnps" not in st.session_state:
+#     st.session_state.formatted_cnps = formatted_cnps
 
-if "formatted_cnddb" not in st.session_state:
-    st.session_state.formatted_cnddb = formatted_cnddb
+# if "formatted_cnddb" not in st.session_state:
+#     st.session_state.formatted_cnddb = formatted_cnddb
 
 # ---------------------------------------------------------
 # OPTIONAL: COMBINE FOR DISPLAY/EDITING IN ONE EDITOR
