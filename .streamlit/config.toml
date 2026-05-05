@@ -1,2 +1,33 @@
-[server]
-fileWatcherType = "none"
+[theme]
+font = "'Roboto':https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap"
+headingFont = "'Roboto':https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&display=swap"
+
+baseFontSize = 16
+
+headingFontSizes = ["3rem", "2rem", "1rem"]
+headingFontWeights = [700, 600, 600]
+
+showWidgetBorder = true
+
+primaryColor = "#375673"               # Coast (Rincon)
+borderColor = "#5b7e95"                # Marina (Rincon)
+secondaryBackgroundColor = "#f4f3ee"   # Sand (Rincon)
+
+greenColor = "#A8CC83"     # Moss (Rincon)
+redColor = "#f43f5e"       # Tailwind Rose
+blueColor = "#375673"      # Sky (Rincon)
+blueTextColor = "#375673"  # Coast (Rincon)
+greenTextColor = "#40846b" # Mint (Rincon)
+
+chartCategoricalColors = [
+    "#1c83e1", # Tailwind Blue
+    "#84cc16", # Tailwind Lime
+    "#f43f5e", # Tailwind Rose
+    "#10b981", # Tailwind Emerald
+    "#84cc16", # Tailwind Lime
+    "#f59e0b", # Tailwind Amber
+    "#2dd4bf", # Tailwind Teal
+    "#facc15", # Tailwind Yellow
+    "#8b5cf6", # Tailwind Violet
+    "#f97316", # Tailwind Orange
+]
