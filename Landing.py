@@ -152,10 +152,12 @@ if uploaded_file is not None:
             st.session_state.search_area = search_area
         elif buffer_choice == '5-Mile':
             distance = 8046.72
-            st.session_state.search_area = create_buffer(st.session_state.project_boundary_gdf, distance)
+            search_area = create_buffer(st.session_state.project_boundary_gdf, distance)
+            st.session_state.search_area = search_area
         elif buffer_choice == '10-Mile':
             distance = 16093.4
-            st.session_state.search_area = create_buffer(st.session_state.project_boundary_gdf, distance)
+            search_area = create_buffer(st.session_state.project_boundary_gdf, distance)
+            st.session_state.search_area = search_area
         elif buffer_choice == '9-Quad':
             all_quads = all_quads.to_crs(st.session_state.project_boundary_gdf.crs)
             quad_ids = get_quads(st.session_state.project_boundary_gdf, all_quads)

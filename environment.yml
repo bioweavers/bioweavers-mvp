@@ -1,4 +1,4 @@
-name: bioweavers
+name: bioweavers-gdf
 channels:
   - conda-forge
 dependencies:
