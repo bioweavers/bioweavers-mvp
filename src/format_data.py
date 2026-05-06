@@ -72,7 +72,7 @@ def format_cnps(df):
     out["PotentialtoOccur"] = ""
     out["HabitatSuitabilityObservations"] = ""
     out["Source"] = "CNPS" # tracking column, will be removed from final product
-    out["TaxonGroup"] = "Plants and Lichens"
+    out["Taxon_Category"] = "Plants and Lichens"
 
     return out
 
@@ -100,6 +100,40 @@ def format_cnddb(df):
     
     def build_habitat_requirements(r):
         return join_lines(r['ECOLOGICAL'])
+    
+    def map_taxon_category(taxon_group):
+        mapping = {
+
+            
+            'Amphibians': 'Amphibians',
+            'Birds': 'Birds',
+            'Fish': 'Fish',
+            'Mammals': 'Mammals',
+            'Reptiles': 'Reptiles',
+
+            'Bryophytes': 'Plants and Lichens',
+            'Dicots': 'Plants and Lichens',
+            'Ferns': 'Plants and Lichens',
+            'Gymnosperms': 'Plants and Lichens',
+            'Lichens': 'Plants and Lichens',
+            'Monocots': 'Plants and Lichens',
+
+            'Arachnids': 'Invertebrates',
+            'Crustaceans': 'Invertebrates',
+            'Insects': 'Invertebrates',
+            'Mollusks': 'Invertebrates',
+
+            'Dune': 'Community',
+            'Forest': 'Community',
+            'Herbaceous': 'Community',
+            'Inland Waters': 'Community',
+            'Marsh': 'Community',
+            'Riparian':  'Community',
+            'Scrub': 'Community',
+            'Woodland': 'Community'
+        }
+
+        return mapping.get(str(taxon_group).strip(), "Other")
 
     out["SpeciesDisplay"] = df.apply(build_species_display, axis=1)
     out["StatusDisplay"] = df.apply(build_status_display, axis=1)
@@ -109,6 +143,6 @@ def format_cnddb(df):
     out["PotentialtoOccur"] = ""
     out["HabitatSuitabilityObservations"] = ""
     out["Source"] = "CNDDB" # tracking column, will be removed from final product
-    # out["TaxonGroup"] = df.TAXONGROUP
+    out["Taxon_Category"] = df["TAXONGROUP"].apply(map_taxon_category)
 
     return out

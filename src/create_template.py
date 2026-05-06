@@ -8,7 +8,7 @@ def create_pto_template(output_path="src/pto_template.docx"):
     doc.add_heading("PTO Assessment Report", level=1)
     doc.add_heading("Potential to Occur Determinations", level=2)
 
-    table = doc.add_table(rows=11, cols=5)
+    table = doc.add_table(rows=5, cols=5)
     table.style = "Table Grid"
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
 
@@ -20,57 +20,38 @@ def create_pto_template(output_path="src/pto_template.docx"):
         "Habitat Suitability/\nObservations",
     ]
 
-    # Header row
     hdr = table.rows[0].cells
     for i, h in enumerate(headers):
         hdr[i].text = h
 
-    # CNPS section header
-    cnps_header = table.rows[1].cells
-    cnps_header[0].merge(cnps_header[-1])
-    cnps_header[0].text = "CNPS Species"
+    # Taxon group loop start
+    table.rows[1].cells[0].text = "{%tr for group in taxon_groups %}"
 
-    # CNPS loop start
-    table.rows[2].cells[0].text = "{%tr for row in cnps_rows %}"
+    # Taxon group header row
+    group_header = table.rows[2].cells
+    group_header[0].merge(group_header[-1])
+    group_header[0].text = "{{ group.TaxonGroup }}"
 
-    # CNPS data row
-    cnps_data = table.rows[3].cells
-    cnps_data[0].text = "{{ row.SpeciesDisplay }}"
-    cnps_data[1].text = "{{ row.StatusDisplay }}"
-    cnps_data[2].text = "{{ row.HabitatRequirements }}"
-    cnps_data[3].text = "{{ row.PotentialtoOccur }}"
-    cnps_data[4].text = "{{ row.HabitatSuitabilityObservations }}"
+    # Species row loop start
+    table.rows[3].cells[0].text = "{%tr for row in group.rows %}"
 
-    # CNPS loop end
-    table.rows[4].cells[0].text = "{%tr endfor %}"
+    # Species data row
+    data = table.rows[4].cells
+    data[0].text = "{{ row.SpeciesDisplay }}"
+    data[1].text = "{{ row.StatusDisplay }}"
+    data[2].text = "{{ row.HabitatRequirements }}"
+    data[3].text = "{{ row.PotentialtoOccur }}"
+    data[4].text = "{{ row.HabitatSuitabilityObservations }}"
 
-    # Blank spacer row if you want
-    spacer = table.rows[5].cells
-    spacer[0].merge(spacer[-1])
-    spacer[0].text = ""
+    # You need two extra rows for the loop endings
+    row_end = table.add_row().cells
+    row_end[0].text = "{%tr endfor %}"
 
-    # CNDDB section header
-    cnddb_header = table.rows[6].cells
-    cnddb_header[0].merge(cnddb_header[-1])
-    cnddb_header[0].text = "CNDDB Species"
-
-    # CNDDB loop start
-    table.rows[7].cells[0].text = "{%tr for row in cnddb_rows %}"
-
-    # CNDDB data row
-    cnddb_data = table.rows[8].cells
-    cnddb_data[0].text = "{{ row.SpeciesDisplay }}"
-    cnddb_data[1].text = "{{ row.StatusDisplay }}"
-    cnddb_data[2].text = "{{ row.HabitatRequirements }}"
-    cnddb_data[3].text = "{{ row.PotentialtoOccur }}"
-    cnddb_data[4].text = "{{ row.HabitatSuitabilityObservations }}"
-
-    # CNDDB loop end
-    table.rows[9].cells[0].text = "{%tr endfor %}"
-
-    # Optional ending blank row
-    end = table.rows[10].cells
-    end[0].merge(end[-1])
-    end[0].text = ""
+    group_end = table.add_row().cells
+    group_end[0].text = "{%tr endfor %}"
 
     doc.save(output_path)
+
+
+if __name__ == "__main__":
+    create_pto_template()
