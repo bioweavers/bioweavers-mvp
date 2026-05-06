@@ -152,15 +152,18 @@ if uploaded_file is not None:
             st.session_state.search_area = search_area
         elif buffer_choice == '5-Mile':
             distance = 8046.72
-            st.session_state.search_area = create_buffer(st.session_state.project_boundary_gdf, distance)
+            search_area = create_buffer(st.session_state.project_boundary_gdf, distance)
+            st.session_state.search_area = search_area
         elif buffer_choice == '10-Mile':
             distance = 16093.4
-            st.session_state.search_area = create_buffer(st.session_state.project_boundary_gdf, distance)
+            search_area = create_buffer(st.session_state.project_boundary_gdf, distance)
+            st.session_state.search_area = search_area
         elif buffer_choice == '9-Quad':
             all_quads = all_quads.to_crs(st.session_state.project_boundary_gdf.crs)
             quad_ids = get_quads(st.session_state.project_boundary_gdf, all_quads)
             buffer_quad_search = get_neighbors(quad_ids, all_quads)
-            st.session_state.search_area = all_quads[all_quads['CELL_MAPCODE'].apply(_cell_map_code).isin(buffer_quad_search)]
+            search_area = all_quads[all_quads['CELL_MAPCODE'].apply(_cell_map_code).isin(buffer_quad_search)]
+            st.session_state.search_area = search_area
 
     # Display the search area on a map using pydeck.
     if search_area is not None:
