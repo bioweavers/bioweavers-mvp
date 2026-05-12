@@ -10,3 +10,5 @@ data/cnddb_obfs_dataset_V2
 data/cnddb_obfs_dataset_V2.csv
 .Rproj.user
 .claude/
+.pytest_cache/
+data/cnddb_obfs_dataset_V3/

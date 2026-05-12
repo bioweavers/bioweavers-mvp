@@ -9,9 +9,12 @@ headingFontWeights = [700, 600, 600]
 
 showWidgetBorder = true
 
-primaryColor = "#375673"               # Coast (Rincon)
-borderColor = "#5b7e95"                # Marina (Rincon)
-secondaryBackgroundColor = "#f4f3ee"   # Sand (Rincon)
+backgroundColor = "#FFFFFF"            
+secondaryBackgroundColor = "#f4f3ee"   # Coast (Rincon)
+primaryColor = "#375673"
+textColor = "#343d4e"                   # Sand (Rincon)
+borderColor = "#f4f3ee"                # Marina (Rincon)
+
 
 greenColor = "#A8CC83"     # Moss (Rincon)
 redColor = "#f43f5e"       # Tailwind Rose

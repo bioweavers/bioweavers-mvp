@@ -29,6 +29,9 @@ if not debugpy.is_client_connected():
 st.session_state.DEBUG = True
 st.set_page_config(layout="wide")
 
+rincon_logo = 'images/Rincon_Logo_Color.png'
+st.logo(rincon_logo, size='large')
+
 # Title of the page.
 st.title('Landing Page')
 
@@ -50,7 +53,7 @@ cnps_path = Path("data/CNPS_RAW.csv")
 cnps = refactor_cnps(cnps_path)
 
 # Load CNDDB data once at startup.
-cnddb_path = Path("data/mock_cnddb_data.geojson")
+cnddb_path = Path("data/cnddb_obfs_dataset_V3/cnddb_obfs_dataset_V3.shp")
 cnddb = gpd.read_file(cnddb_path)
 
 # Create file upload button for user to upload their own boundary file (GeoJSON format).
@@ -205,27 +208,39 @@ if uploaded_file is not None:
             map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
         ))
 
-
-    # After defining the search area, query the CNDDB and CNPS datasets.
     if run_buffer and search_area is not None:
 
-        # Extract the quad IDs from the search area. (IS THIS WHAT ITS DOING)
+        # Query CNDDB dataset using spatial clip against search area.
+        cnddb_species = get_species_cnddb(cnddb, st.session_state.search_area)
+
+        # Keep quad ID extraction only if needed for CNPS or other datasets
         if buffer_choice == '9-Quad':
-            # `Search_area` is already quads, extract IDs directly.
             search_quad_ids = set(st.session_state.search_area['CELL_MAPCODE'].apply(_cell_map_code).tolist())
         else:
-            # Reproject quads to match the search area CRS for accurate spatial intersection.
             all_quads_reproj = all_quads.to_crs(st.session_state.search_area.crs)
-
-            #st.write("search_area bounds:", search_area.total_bounds)
-            #st.write("search_area CRS:", search_area.crs)
-            #st.write("search_area geometry:", search_area.geometry.values)
-
-            # `Search_area` is a buffered polygon, find which quads intersect it.
             search_quad_ids = get_quads(st.session_state.search_area, all_quads_reproj)
 
+
+    # # After defining the search area, query the CNDDB and CNPS datasets.
+    # if run_buffer and search_area is not None:
+
+    #     # Extract the quad IDs from the search area. (IS THIS WHAT ITS DOING)
+    #     if buffer_choice == '9-Quad':
+    #         # `Search_area` is already quads, extract IDs directly.
+    #         search_quad_ids = set(st.session_state.search_area['CELL_MAPCODE'].apply(_cell_map_code).tolist())
+    #     else:
+    #         # Reproject quads to match the search area CRS for accurate spatial intersection.
+    #         all_quads_reproj = all_quads.to_crs(st.session_state.search_area.crs)
+
+    #         #st.write("search_area bounds:", search_area.total_bounds)
+    #         #st.write("search_area CRS:", search_area.crs)
+    #         #st.write("search_area geometry:", search_area.geometry.values)
+
+    #         # `Search_area` is a buffered polygon, find which quads intersect it.
+    #         search_quad_ids = get_quads(st.session_state.search_area, all_quads_reproj)
+
         # Query CNDDB dataset using the extracted quad IDs.
-        cnddb_species = get_species_cnddb(cnddb_path, search_quad_ids)
+        #cnddb_species = get_species_cnddb(cnddb, search_area)
 
         # Query CNPS dataset using the extracted quad IDs.    
         cnps_species = get_species_cnps(cnps, search_quad_ids)

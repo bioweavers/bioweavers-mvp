@@ -4,6 +4,9 @@ import streamlit as st
 # Import necessary functions from src modules.
 from src.species import plot_species_map_streamlit, refactor_cnps, plot_cnddb_species_distribution_streamlit, plot_cnddb_species_date_range
 
+rincon_logo = 'images/Rincon_Logo_Color.png'
+st.logo(rincon_logo, size='large')
+
 # Title of the page.
 st.title("Project Species Occurrences Results")
 
@@ -42,12 +45,12 @@ st.header("Species Occurrence Raw Data", divider='blue')
 # Display the results in tables.
 st.subheader("California Natural Diversity Database Species Results")
 st.write(f"Found {len(cnddb_species)} species occurrences")
-st.dataframe(cnddb_species.drop(columns='geometry'))
+st.dataframe(cnddb_species.drop(columns='geometry'), column_order=['SNAME', 'CNAME', 'OCCNUMBER', 'TAXONGROUP', 'ACCURACY', 'PRESENCE', 'OCCTYPE', 'SITEDATE', 'ELMDATE', 'FEDLIST', 'CALLIST','GRANK', 'SRANK', 'RPLANTRANK', 'CDFWSTATUS', 'OTHRSTATUS', 'LOCDETAILS', 'ECOLOGICAL', 'GENERAL', 'LASTUPDATE'])
 
 # Display the results in tables.
 st.subheader("California Native Plant Society Species Results")
 st.write(f"Found {len(cnps_species)} species occurrences")
-st.dataframe(cnps_species)
+st.dataframe(cnps_species.drop(columns='split_quad'))
 
 # Include page link button.
 st.page_link("pages/2_Table.py", label="Go to PTO Table Page", width='stretch')

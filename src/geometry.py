@@ -320,31 +320,79 @@ def get_species_cnps(cnps_df, quad_ids):
 # %%
 
 # Create a function to get the species from the CNDDB data that are found in the quads that intersect with the boundary.
-def get_species_cnddb(file_path: str | Path, quad_ids):
+# def get_species_cnddb(file_path: str | Path, quad_ids):
+#     '''
+#     Get the species from the CNDDB data that are found in the quads that intersect with the boundary.
+
+#     Parameters
+#     ----------
+#     cnps_df : pd.DataFrame
+#         DataFrame containing the CNDDB species data, which includes a column 'KEYQUAD' that lists the quad IDs associated with each species.
+#     quad_ids : set
+#         A set of quad IDs that intersect with the boundary
+
+#     Returns
+#     ----------
+#     pd.DataFrame
+#         A DataFrame containing the species from the CNDDB data that are found in the quads that intersect with the boundary.
+#     '''
+
+#     excluded_taxongroups = {
+#         'Dune', 'Forest', 'Herbaceous', 'Inland Waters', 'Marsh', 'Riparian', 'Scrub', 'Woodland', 'Palustrine'
+#     }
+
+#     # Read the CNDDB csv file
+#     file_path = Path(file_path)    
+#     cnddb_gdf = gpd.read_file(file_path)
+
+#     cnddb_species = cnddb_gdf[
+#         cnddb_gdf['KEYQUAD'].astype(str).isin([str(q) for q in quad_ids]) &
+#         ~cnddb_gdf['TAXONGROUP'].isin(excluded_taxongroups)
+#     ].copy()
+
+#     # Filter the CNDDB DataFrame to include only the rows where the 'KEYQUAD' column contains a quad ID that is in the set of quad IDs that intersect with the boundary.
+#     #cnddb_species = cnddb_gdf[cnddb_gdf['KEYQUAD'].isin(quad_ids)].copy()
+#     return cnddb_species
+
+# %%
+def get_species_cnddb(file_path: str | Path, boundary: gpd.GeoDataFrame):
     '''
-    Get the species from the CNDDB data that are found in the quads that intersect with the boundary.
+    Get the species from the CNDDB data that spatially intersect with the boundary.
 
     Parameters
     ----------
-    cnps_df : pd.DataFrame
-        DataFrame containing the CNDDB species data, which includes a column 'KEYQUAD' that lists the quad IDs associated with each species.
-    quad_ids : set
-        A set of quad IDs that intersect with the boundary
+    file_path : str | Path
+        Path to the CNDDB shapefile or GeoJSON.
+    boundary : gpd.GeoDataFrame
+        GeoDataFrame of the search area boundary to clip species to.
 
     Returns
     ----------
-    pd.DataFrame
-        A DataFrame containing the species from the CNDDB data that are found in the quads that intersect with the boundary.
+    gpd.GeoDataFrame
+        A GeoDataFrame containing the species from the CNDDB data that 
+        spatially intersect with the boundary.
     '''
 
-    # Read the CNDDB csv file
-    file_path = Path(file_path)    
-    cnddb_gdf = gpd.read_file(file_path)
+    excluded_taxongroups = {
+        'Dune', 'Forest', 'Herbaceous', 'Inland Waters', 'Marsh', 'Riparian', 'Scrub', 'Woodland', 'Palustrine'
+    }
 
-    cnddb_species = cnddb_gdf[cnddb_gdf['KEYQUAD'].astype(str).isin([str(q) for q in quad_ids])].copy()
+    # Accept either a file path or an already-loaded GeoDataFrame
+    if isinstance(file_path, gpd.GeoDataFrame):
+        cnddb_gdf = file_path
+    else:
+        cnddb_gdf = gpd.read_file(Path(file_path))
 
-    # Filter the CNDDB DataFrame to include only the rows where the 'KEYQUAD' column contains a quad ID that is in the set of quad IDs that intersect with the boundary.
-    #cnddb_species = cnddb_gdf[cnddb_gdf['KEYQUAD'].isin(quad_ids)].copy()
+    # Filter excluded taxon groups first (faster clip)
+    cnddb_gdf = cnddb_gdf[~cnddb_gdf['TAXONGROUP'].isin(excluded_taxongroups)]
+
+    # Ensure CRS match before clipping
+    if cnddb_gdf.crs != boundary.crs:
+        boundary = boundary.to_crs(cnddb_gdf.crs)
+
+    # Clip to boundary instead of KEYQUAD filter
+    cnddb_species = gpd.clip(cnddb_gdf, boundary)
+
     return cnddb_species
 
 # %%
