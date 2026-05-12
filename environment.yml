@@ -1,4 +1,4 @@
-name: bioweavers-mvp
+name: bioweavers
 channels:
   - conda-forge
 dependencies:
