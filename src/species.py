@@ -86,7 +86,7 @@ def plot_cnddb_species_distribution_streamlit(df):
         yaxis=dict(gridcolor='#eeeeee'),
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
 
 
 
@@ -176,22 +176,29 @@ def plot_species_map(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.GeoDataFram
 # Create a function to plot the species occurrences on an interactive map using PyDeck.
 def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.GeoDataFrame, project_boundary_gdf: gpd.GeoDataFrame = None, output_path: str = None):
 
+    TAXONGROUP_COLORS = {
+    'Amphibians': [253, 161, 106], 'Birds': [253, 161, 106], 'Fish': [253, 161, 106],
+    'Mammals': [253, 161, 106], 'Reptiles': [253, 161, 106], 'Arachnids': [253, 161, 106],
+    'Crustaceans': [253, 161, 106], 'Insects': [253, 161, 106], 'Mollusks': [253, 161, 106],
+    'Bryophytes': [168, 204, 131], 'Dicots': [168, 204, 131], 'Ferns': [168, 204, 131],
+    'Gymnosperms': [168, 204, 131], 'Lichens': [168, 204, 131], 'Monocots': [168, 204, 131],
+    }
+
     # Reproject to WGS84 for PyDeck.
     cnddb_wgs = cnddb_map_data.to_crs(epsg=4326)
     boundary_wgs = boundary.to_crs(epsg=4326)
 
-    # Create copy of the boundary GeoDataFrame.
-    clip_mask = boundary_wgs.copy()
+    # Buffer in projected CRS (meters), then reproject to WGS84
+    # clip_mask = boundary.copy()
+    # clip_mask['geometry'] = boundary.geometry.buffer(100)  # 100 meters
+    # clip_mask = clip_mask.to_crs(epsg=4326)
 
-    # re-project geometries to a projected CRS before buffer operation
-    # if st.session_state.DEBUG:
-        # st.info("About to project clip_mask to crs")
-    
-    clip_mask.to_crs(epsg=4326)
-    # Buffer the boundary by a small amount to ensure we capture species occurrences that are near the edge of the search area. 
-    clip_mask['geometry'] = boundary_wgs.geometry.buffer(0.00001)
-    
-    # Clip the species occurrences to the buffered boundary to focus on the area of interest.
+    # Reproject to projected CRS for buffering
+    clip_mask = boundary.to_crs(epsg=3310)  # California Albers
+    clip_mask['geometry'] = clip_mask.geometry.buffer(100)  # 100 meters
+    clip_mask = clip_mask.to_crs(epsg=4326)  # back to WGS84 for clipping
+
+    # Clip the species occurrences to the buffered boundary.
     cnddb_clipped = gpd.clip(cnddb_wgs, clip_mask)
 
     # Convert GeoDataFrames to GeoJSON format for PyDeck.
@@ -201,14 +208,24 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
             gdf[col] = gdf[col].astype(str)
         return json.loads(gdf.to_json())
 
-    # Create species layer. 
+    # Add color columns based on TAXONGROUP
+    default_color = [150, 150, 150]
+    cnddb_clipped = cnddb_clipped.copy()
+    cnddb_clipped['fill_color'] = cnddb_clipped['TAXONGROUP'].map(
+    lambda x: TAXONGROUP_COLORS.get(x, default_color) + [150]  # append alpha
+    )
+    cnddb_clipped['line_color'] = cnddb_clipped['TAXONGROUP'].map(
+    lambda x: TAXONGROUP_COLORS.get(x, default_color)
+    )
+
+        # Create species layer. 
     species_layer = pdk.Layer(
         type="GeoJsonLayer",
         data=cnddb_clipped, 
-        stroked=True,           # Outline the polygons.
-        filled=True,            # Fill the polygons with color.
-        get_fill_color=[253, 161, 106, 150],
-        get_line_color=[253, 161, 106],
+        stroked=True,
+        filled=True,
+        get_fill_color='fill_color',    # reference the column
+        get_line_color='line_color',
         line_width_min_pixels=1,
         pickable=True,
     )
