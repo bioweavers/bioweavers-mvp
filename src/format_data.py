@@ -8,7 +8,11 @@ def join_lines(*parts):
 # Format CNPS data for Potential to Occur output
 def format_cnps(df):
     out = pd.DataFrame()
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 4803462ce6584d69bdc8082f99271a653c11f38b
     def build_species_display(r):
         return join_lines(r['ScientificName'], r['CommonName'])
 
@@ -64,7 +68,11 @@ def format_cnps(df):
         )
 
         return join_lines(*parts)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 4803462ce6584d69bdc8082f99271a653c11f38b
     out["SpeciesDisplay"] = df.apply(build_species_display, axis=1)
     out["StatusDisplay"] = df.apply(build_status_display, axis=1)
     out["HabitatRequirements"] = df.apply(build_habitat_requirements, axis=1)
@@ -97,6 +105,7 @@ def format_cnddb(df):
             if pd.notna(r.get(col))
         ]
         return join_lines(*parts)
+<<<<<<< HEAD
     
     def build_habitat_requirements(r):
         return join_lines(r['ECOLOGICAL'])
@@ -105,6 +114,16 @@ def format_cnddb(df):
         mapping = {
 
             
+=======
+
+    def build_habitat_requirements(r):
+        return join_lines(r['ECOLOGICAL'])
+
+    def map_taxon_category(taxon_group):
+        mapping = {
+
+
+>>>>>>> 4803462ce6584d69bdc8082f99271a653c11f38b
             'Amphibians': 'Amphibians',
             'Birds': 'Birds',
             'Fish': 'Fish',
@@ -138,11 +157,19 @@ def format_cnddb(df):
     out["SpeciesDisplay"] = df.apply(build_species_display, axis=1)
     out["StatusDisplay"] = df.apply(build_status_display, axis=1)
     out["HabitatRequirements"] = df.apply(build_habitat_requirements, axis=1)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 4803462ce6584d69bdc8082f99271a653c11f38b
 
     out["PotentialtoOccur"] = ""
     out["HabitatSuitabilityObservations"] = ""
     out["Source"] = "CNDDB" # tracking column, will be removed from final product
     out["Taxon_Category"] = df["TAXONGROUP"].apply(map_taxon_category)
 
+<<<<<<< HEAD
     return out
+=======
+    return out
+>>>>>>> 4803462ce6584d69bdc8082f99271a653c11f38b

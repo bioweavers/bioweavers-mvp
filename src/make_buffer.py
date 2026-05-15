@@ -12,7 +12,11 @@ def make_buffer():
 
     if "_latest_editor" in st.session_state:
         edited_combined = st.session_state._latest_editor.copy()
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 4803462ce6584d69bdc8082f99271a653c11f38b
     elif "combined_pto" in st.session_state:
         edited_combined = st.session_state.combined_pto.copy()
     else:
@@ -20,7 +24,11 @@ def make_buffer():
         return None
 
     taxon_groups = []
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 4803462ce6584d69bdc8082f99271a653c11f38b
     for taxon, group_df in edited_combined.groupby("Taxon_Category", dropna=False):
         taxon_groups.append({
             "TaxonGroup": taxon if pd.notna(taxon) and str(taxon).strip() else "Uncategorized",
@@ -38,5 +46,9 @@ def make_buffer():
         return None
 
     buffer.seek(0)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 4803462ce6584d69bdc8082f99271a653c11f38b
     return buffer.getvalue()

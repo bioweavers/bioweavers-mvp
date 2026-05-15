@@ -54,4 +54,8 @@ def create_pto_template(output_path="src/pto_template.docx"):
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     create_pto_template()
+=======
+    create_pto_template()
+>>>>>>> 4803462ce6584d69bdc8082f99271a653c11f38b

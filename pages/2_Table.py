@@ -42,8 +42,16 @@ cnddb_queried = st.session_state.cnddb_raw.copy()
 # ---------------------------------------------------------
 # TRANSFORM RAW DATA INTO CLIENT-FACING FORMAT
 # ---------------------------------------------------------
-# formatted_cnps = format_cnps(cnps_queried).copy()
-# formatted_cnddb = format_cnddb(cnddb_queried).copy()
+formatted_cnps = format_cnps(cnps_queried).copy()
+formatted_cnddb = format_cnddb(cnddb_queried).copy()
+
+if "Taxon_Category" not in formatted_cnps.columns:
+    formatted_cnps["Taxon_Category"] = "Plants"
+
+if "Taxon_Category" not in formatted_cnddb.columns:
+    st.error("CNDDB formatted table is missing Taxon_Category. Check format_cnddb().")
+    st.stop()
+
 
 if "Taxon_Category" not in formatted_cnps.columns:
     formatted_cnps["Taxon_Category"] = "Plants"
