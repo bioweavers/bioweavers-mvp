@@ -57,29 +57,32 @@ def plot_cnddb_species_distribution(df):
 # %%
 # Create a function to plot the distribution of CNDDB species occurrences in Streamlit.
 def plot_cnddb_species_distribution_streamlit(df):
-    # chart_data = df.drop(columns='geometry').sort_values('EOCOUNT', ascending=False)
-    # st.bar_chart(
-    #     chart_data,
-    #     x='SNAME',
-    #     y='EOCOUNT')
-
     chart_data = df.drop(columns='geometry')
-    chart_data = chart_data.groupby('SNAME', as_index=False)['EOCOUNT'].sum()  # aggregate duplicates
-    chart_data = chart_data.sort_values('EOCOUNT', ascending=False)
+    
+    # Group by ELMCODE (reliable species ID), keep SNAME for display
+    chart_data = (
+        chart_data.groupby('ELMCODE', as_index=False)
+        .agg(
+            SNAME=('SNAME', 'first'),               # one name per species
+            occurrence_count=('ELMCODE', 'count')   # how many occurrences in query
+        )
+        .sort_values('occurrence_count', ascending=False)
+    )
     
     fig = px.bar(
         chart_data,
-        x='EOCOUNT',
+        x='occurrence_count',
         y='SNAME',
-        category_orders={'SNAME': chart_data['SNAME'].tolist()},  # enforces sort order
-        color_discrete_sequence=['#375673'],  # bar color
+        category_orders={'SNAME': chart_data['SNAME'].tolist()},
+        color_discrete_sequence=['#375673'],
         labels={
-            'EOCOUNT': "Species Occurrence Count",
+            'occurrence_count': 'Occurrence Count',
             'SNAME': 'Scientific Name'
         }
     )
     
     fig.update_layout(
+        height=800,
         font_family='Roboto',
         font_color='#333333',
         plot_bgcolor='white',
@@ -88,11 +91,7 @@ def plot_cnddb_species_distribution_streamlit(df):
     
     st.plotly_chart(fig, width='stretch')
 
-
-
 #%%
-
-
 def plot_cnddb_species_date_range(df):
     df = df.copy()
     df["ELMDATE"] = pd.to_datetime(df["ELMDATE"], format="%Y%m%d")
