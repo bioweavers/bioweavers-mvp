@@ -1,0 +1,19 @@
+FROM continuumio/miniconda3
+
+WORKDIR .
+
+COPY environment.yml .
+
+# Force conda-forge priority before creating the env
+RUN conda config --add channels conda-forge && \
+    conda config --set channel_priority strict && \
+    conda env create -f environment.yml && \
+    conda clean -afy  # reduce image size
+
+COPY . .
+
+EXPOSE 3009
+
+CMD ["conda", "run", "--no-capture-output", "-n", "bioweavers-gdf", \
+     "streamlit", "run", "./Landing.py", \
+     "--server.port=3009", "--server.address=0.0.0.0"]

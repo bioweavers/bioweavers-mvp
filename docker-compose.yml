@@ -2,10 +2,10 @@ services:
 
   # Dashboard application service - runs the Plotly Dash app
   bioweaver_dashboard:
-    image: bioweaver_dashboard
+    image: bioweaver_dashboard:latest
     build: .
     volumes:
-      - ./data:/data/
+      - ./data:/tmp/data/
       - ./pages:/pages/
       - ./src:/src/
   
