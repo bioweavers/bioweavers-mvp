@@ -1,4 +1,5 @@
 #%%
+# Import necessary libraries.
 from pathlib import Path
 import pandas as pd
 import geopandas as gpd
@@ -34,11 +35,6 @@ def load_boundary(file_path: str | Path) -> gpd.GeoDataFrame:
     The function currently supports GeoJSON and Shapefile formats. 
     KMZ support may be added in the future.
     '''
-
-    # TODO: 
-    # Handle different file formats
-    # For now, we will assume that the file is a GeoJSON or Shapefile
-    # Add kmz support in the future
     
     # Read the boundary file using geopandas.
     file_path = Path(file_path)    
@@ -50,7 +46,6 @@ def load_boundary(file_path: str | Path) -> gpd.GeoDataFrame:
     return gdf
 
 #%%
-
 # Create a function to create a buffer around the boundary and return a new GeoDataFrame with the buffered geometry.
 def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
     '''
@@ -130,33 +125,6 @@ def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
     # Return the buffered GeoDataFrame in the original CRS       
     return gdf_buffered
 
-
-#%%
-
-# Create a function of get a bounding box from a GeoDataFrame.
-def get_bounding_box(gdf: gpd.GeoDataFrame) -> np.ndarray:
-    '''
-    Get the bounding box of the geometries in a GeoDataFrame.
-
-    Parameters
-    ----------
-    gdf : gpd.GeoDataFrame
-        GeoDataFrame with the boundary geometry loaded from the file
-
-    Returns 
-    ----------
-    np.ndarray
-        Array with the bounding box coordinates [minx, miny, maxx, maxy]
-
-    Notes
-    ----------
-    Returns an array with the bounding box coordinates [minx, miny, maxx, maxy] of the geometries in the GeoDataFrame.
-    '''
-
-    # Get the total bounds of the geometries in the GeoDataFrame.
-    bounds = gdf.total_bounds
-    return bounds
-
 #%%
 # Create a function load all California quads from a file and return a GeoDataFrame.
 def load_all_quads(filepath: str | Path) -> gpd.GeoDataFrame:
@@ -178,7 +146,6 @@ def load_all_quads(filepath: str | Path) -> gpd.GeoDataFrame:
     filepath = Path(filepath)
     gdf = gpd.read_file(filepath)
     return gdf
-
 #%%
 # Create a function to refactor the 'CELL_MAPCODE' column in a CNPS CSV file to extract quad IDs as a list of integers.
 def _cell_map_code(id):
@@ -210,7 +177,7 @@ def _cell_map_code(id):
     # Combine the lead part and the numeric value of the letter to create a unique integer ID for the quad.
     cell_map_code = str(lead) + str(my_num) + str(tail[1])
     return int(cell_map_code)
-
+#%%
 # Create a function to get the quads that intersect with the boundary and return a set of quad IDs.
 def get_quads(boundary, all_quads):
     '''
@@ -229,8 +196,7 @@ def get_quads(boundary, all_quads):
         A set of quad IDs that intersect with the boundary.
     '''
 
-    #TODO: Ensure CRS consistency before intersect command
-
+    # Ensure that the CRS of the boundary and all_quads GeoDataFrames are the same before performing intersection.
     assert boundary.crs == all_quads.crs, "CRS of boundary and all_quads GeoDataFrames must be the same before performing intersection."
 
     # Get total bounds of the boundary GeoDataFrame.
@@ -245,8 +211,7 @@ def get_quads(boundary, all_quads):
     # Refactor the 'CELL_MAPCODE' column in the quads GeoDataFrame to extract quad IDs as a list of integers and return a set of unique quad IDs.
     cell_map_codes = [_cell_map_code(id) for id in set(quads['CELL_MAPCODE'])]
     return set(cell_map_codes)
-
-#%
+#%%
 def get_neighbors(quad_ids, all_quads: gpd.GeoDataFrame):
     '''
     Find the neighboring quads surrounding a center quad.
@@ -269,16 +234,19 @@ def get_neighbors(quad_ids, all_quads: gpd.GeoDataFrame):
     surrounding quads without decimal point precision issues. 
     '''
 
+    # Make a copy of the all_quads GeoDataFrame.
     all_quads = all_quads.copy()
+    # Refactor the 'CELL_MAPCODE' column in the quads GeoDataFrame to extract quad IDs as a list of integers.
     all_quads['CELL_MAPCODE'] = all_quads['CELL_MAPCODE'].apply(_cell_map_code)
 
+    # Loop through the list of quad IDs and find the neighboring quads that intersect with the buffered bounding box of each quad.
     neighbors = []
     for id in quad_ids:
 
         quad = all_quads[all_quads['CELL_MAPCODE'] == id]
 
         if quad.empty:
-            continue  # skip unmatched IDs
+            continue  # Skip unmatched IDs.
 
         minx, miny, maxx, maxy = quad.total_bounds
 
@@ -287,14 +255,12 @@ def get_neighbors(quad_ids, all_quads: gpd.GeoDataFrame):
         dy = (maxy - miny) * 0.02
         bbox = box(minx - dx, miny - dy, maxx + dx, maxy + dy)
 
+        # Find neighboring quads that intersect with the buffered bounding box and add their CELL_MAPCODE values to the neighbors list.
         neighbor_quads = all_quads[all_quads.intersects(bbox)].copy()
         neighbors.extend(neighbor_quads['CELL_MAPCODE'].to_list())
 
     return list(set(neighbors))
 # %%
-
-# %%
-
 # Create a function to filter the CNPS data on the set of quads.
 def get_species_cnps(cnps_df, quad_ids):
     '''
@@ -355,6 +321,7 @@ def get_species_cnps(cnps_df, quad_ids):
 #     return cnddb_species
 
 # %%
+# Create a function to get the species from the CNDDB data that spatially intersect with the search area.
 def get_species_cnddb(file_path: str | Path, boundary: gpd.GeoDataFrame):
     '''
     Get the species from the CNDDB data that spatially intersect with the boundary.
@@ -373,24 +340,25 @@ def get_species_cnddb(file_path: str | Path, boundary: gpd.GeoDataFrame):
         spatially intersect with the boundary.
     '''
 
+    # Define a set of taxon groups to exclude from the search query, as they are considered communities and not individual species.
     excluded_taxongroups = {
         'Dune', 'Forest', 'Herbaceous', 'Inland Waters', 'Marsh', 'Riparian', 'Scrub', 'Woodland', 'Palustrine'
     }
 
-    # Accept either a file path or an already-loaded GeoDataFrame
+    # Accept either a file path or an already-loaded GeoDataFrame.
     if isinstance(file_path, gpd.GeoDataFrame):
         cnddb_gdf = file_path
     else:
         cnddb_gdf = gpd.read_file(Path(file_path))
 
-    # Filter excluded taxon groups first (faster clip)
+    # Filter excluded taxon groups first (faster clip).
     cnddb_gdf = cnddb_gdf[~cnddb_gdf['TAXONGROUP'].isin(excluded_taxongroups)]
 
     # Ensure CRS match before clipping
     if cnddb_gdf.crs != boundary.crs:
         boundary = boundary.to_crs(cnddb_gdf.crs)
 
-    # Clip to boundary instead of KEYQUAD filter
+    # Clip to boundary.
     cnddb_species = gpd.clip(cnddb_gdf, boundary)
 
     return cnddb_species

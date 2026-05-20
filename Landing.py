@@ -39,8 +39,8 @@ st.title('Landing Page')
 st.header("Upload Project Boundary", divider="blue")
 
 # Import necessary functions from src modules.
-from src.geometry import _cell_map_code, load_boundary, create_buffer, get_bounding_box, load_all_quads, get_quads, get_species_cnps, get_species_cnddb, get_neighbors
-from src.species import plot_species_map_streamlit, refactor_cnps, plot_cnddb_species_distribution_streamlit, plot_cnddb_species_date_range
+from src.geometry import _cell_map_code, load_boundary, create_buffer, load_all_quads, get_quads, get_species_cnps, get_species_cnddb, get_neighbors
+from src.species import plot_species_map_streamlit, refactor_cnps, plot_cnddb_species_distribution_streamlit
 
 # Import data and perform necessary preprocessing at startup.
 
@@ -118,8 +118,8 @@ if uploaded_file is not None:
     pickable=True,
     stroked=True,
     filled=False,                
-    get_line_color="'#B22222'",  # Boundary defined by black line.
-    line_width_min_pixels=2)     # Ensures line is visible at any zoom.
+    get_line_color="'#B22222'",         # Boundary defined by black line.
+    line_width_min_pixels=2)            # Ensures line is visible at any zoom.
 
     # Set the initial view state of the map to center on the boundary.
     view_state = pdk.ViewState(
@@ -131,7 +131,7 @@ if uploaded_file is not None:
     # Render the map with the boundary layer.
     st.pydeck_chart(pdk.Deck(
     layers=[st.session_state.project_boundary_layer],    # Map the project boundary layer.
-    initial_view_state=view_state,      # Set initial view to center on the boundary.
+    initial_view_state=view_state,                       # Set initial view to center on the boundary.
     map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"))  # Add a basemap.
 
     # View project boundary with an applied buffer.
@@ -141,14 +141,13 @@ if uploaded_file is not None:
     buffer_option_names = ['2-Mile', '5-Mile', '10-Mile', '9-Quad']
 
     # Create a radio button for buffer search options.
-    # buffer_choice = st.radio("Select a buffer search option:", buffer_option_names)
-
-    # search_area = None
-
     buffer_choice = st.radio("Select a buffer search option:", buffer_option_names, key="buffer_radio")
-    run_buffer = st.button("Apply Buffer", type="primary")  # ADD THIS
 
-    if run_buffer:  # only runs when clicked
+    # Create a button to apply the selected buffer and perform the search.
+    run_buffer = st.button("Apply Buffer", type="primary")  
+
+    # Only runs when clicked.
+    if run_buffer:  
         if buffer_choice == '2-Mile':
             distance = 3218.69
             search_area = create_buffer(st.session_state.project_boundary_gdf, distance)
@@ -213,7 +212,7 @@ if uploaded_file is not None:
         # Query CNDDB dataset using spatial clip against search area.
         cnddb_species = get_species_cnddb(cnddb, st.session_state.search_area)
 
-        # Keep quad ID extraction only if needed for CNPS or other datasets
+        # Keep quad ID extraction for CNPS dataset.
         if buffer_choice == '9-Quad':
             search_quad_ids = set(st.session_state.search_area['CELL_MAPCODE'].apply(_cell_map_code).tolist())
         else:
@@ -251,118 +250,54 @@ if uploaded_file is not None:
         # if "cnddb_raw" not in st.session_state:
         #     st.session_state.cnddb_raw = pd.read_csv("app/data/cnddb_test_data.csv")
 
+        # Initialize editor version if this is the first run,  increment it on every subsequent query so dependent pages know to re-render with fresh data.
         if "editor_version" not in st.session_state:
              st.session_state.editor_version = 0
 
+        # Save queried species data to session state for use in Results page.
         st.session_state.cnps_raw = cnps_species
         st.session_state.cnddb_raw = cnddb_species
 
+        # Trigger a refresh on other pages that depend on the queried data by incrementing the editor version.
         st.session_state.editor_version += 1
 
-        # st.session_state.search_area = search_area          # add this
-        # st.session_state.project_boundary_gdf = project_boundary_gdf  # add this
-        st.session_state.results_ready = True               # add this
+        # Signal that results are ready to be viewed on other pages.
+        st.session_state.results_ready = True      
 
-        st.page_link("pages/1_Results.py", label="Go to Results", width='content', icon_position="right")
+        # Styling for the page link button.
+        st.markdown("""
+            <style>
+            [data-testid="stPageLink"] a {
+                background-color: #375673;
+                color: var(--primary-foreground-color) !important;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 16px;
+            }
+            [data-testid="stPageLink"] a p {
+            color: #FFFFFF !important;
+            }
+            [data-testid="stPageLink"] a:hover {
+                background-color: #375673;
+                opacity: 0.85;
+                color: #FFFFFF !important;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 16px;
+            }
+            </style>
+        """, unsafe_allow_html=True)     
 
-        # # Display the results in tables.
-        # st.subheader("CNDDB Species Results")
-        # st.write(f"Found {len(cnddb_species)} species occurrences")
-        # st.dataframe(cnddb_species.drop(columns='geometry'))
-
-        # # Display the results in tables.
-        # st.subheader("CNPS Species Results")
-        # st.write(f"Found {len(cnps_species)} species occurrences")
-        # st.dataframe(cnps_species)
-
-        # # Map CNDDB species occurrences within the project boundary.
-        # st.subheader("CNDDB Species Map")
-        # plot_species_map_streamlit(cnddb_species, search_area, project_boundary_gdf) 
-
-        # # Graph the number of CNDDB species occurrences .
-        # st.subheader("CNDDB Species Occurrence")
-        # plot_cnddb_species_distribution_streamlit(cnddb_species)
-
-
-
-
-
-
-
-# # # Load sample boundary.
-# # boundary_path = Path("data/sample_boundary.geojson")
-# # boundary = load_boundary(boundary_path)
-
-# # # Create a 5-mile buffer and bounding box.
-# # buffered = create_buffer(boundary, distance=5)
-# # bbox = get_bounding_box(buffered)
-
-# # # Load in all quads in California.
-# # all_quads_path = Path("data/california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson")
-# # all_quads = load_all_quads(all_quads_path)
-
-# # # Get the list of quads that intersect with the boundary.
-# # quad_ids = get_quads(boundary, all_quads)
-
-# # # 9-quad buffer search.
-# # buffer_quad_search = get_neighbors(quad_ids, all_quads)
-
-# # # Refactor CNPS Quad list.
-# # cnps_path = Path("data/CNPS_RAW.csv")
-# # cnps = refactor_cnps(cnps_path)
-
-# # # Get the CNPS species that are found within the intersecting quads.
-# # cnps_species = get_species_cnps(cnps, quad_ids)
-
-# # # edit cnps and cnddb filtered dataframe to add empty columns fo integration to platform
-
-# # edited_cnps = st.data_editor(cnps_species[["ScientificName", "CommonName", "FESA"]],
-# #                num_rows="fixed",
-# #                disabled=["ScientificName", "CommonName"],)
-
-# # # download button
-# # st.download_button(
-# #     label="Download PTO Assessment",
-# #     data=edited_cnps.to_docx(index=False),
-# #     file_name='pto_assessment.docx',
-# #     mime='text/docx',
-# # )
+        # Add a button to navigate to the Results page, once steps on Landing page are completed.
+        st.page_link("pages/1_Results.py", label="Go to Results Page", width='content', icon_position="right")
 
 
-# # from docx import Document
-# # from io import BytesIO
 
-# # def df_to_docx(df):
-# #     doc = Document()
-# #     doc.add_heading('PTO Assessment', 0)
 
-# #     table = doc.add_table(rows=1, cols=len(df.columns))
-    
-# #     # header row
-# #     for i, col in enumerate(df.columns):
-# #         table.rows[0].cells[i].text = str(col)
 
-# #     # data rows
-# #     for _, row in df.iterrows():
-# #         cells = table.add_row().cells
-# #         for i, val in enumerate(row):
-# #             cells[i].text = str(val)
 
-# #     buffer = BytesIO()
-# #     doc.save(buffer)
-# #     buffer.seek(0)
-    
-# #     return buffer
 
-# # # create docx
-# # docx_file = df_to_docx(edited_cnps)
 
-# # # download button
-# # st.download_button(
-# #     label="Download PTO Assessment",
-# #     data=docx_file,
-# #     file_name="pto_assessment.docx",
-# #     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-# # )
+
 
 

@@ -1,4 +1,5 @@
 #%%
+# Import necessary libraries.
 from pathlib import Path
 import requests
 import pandas as pd
@@ -9,43 +10,39 @@ import streamlit as st
 import pydeck as pdk
 import json
 import streamlit as st
-
-
 #%%
 # Create function to refactor the CNPS 'Quads' column
 def refactor_cnps(file_path: str | Path) -> pd.DataFrame:
-        '''
-        Refactor the 'Quads' column in a CNPS CSV file to extract quad IDs as a list of integers.
+    '''
+    Refactor the 'Quads' column in a CNPS CSV file to extract quad IDs as a list of integers.
 
-        Parameters
-        ----------
-        file_path : str | Path
-            Path to the California Native Plant Society CSV file
+    Parameters
+    ----------
+    file_path : str | Path
+        Path to the California Native Plant Society CSV file
 
-        Returns 
-        ----------
-        pd.DataFrame
-            DataFrame with the 'Quads' column refactored toa new column 'split_quad' to extract quad IDs as a list of integers.
+    Returns 
+    ----------
+    pd.DataFrame
+        DataFrame with the 'Quads' column refactored to a new column 'split_quad' to extract quad IDs as a list of integers.
 
-        Notes
-        ----------
-        Returns a DataFrame with an additional column 'split_quad' that contains the extracted quad IDs as lists of integers. 
-        The original 'Quads' column is left unchanged.
-        '''
+    Notes
+    ----------
+    Returns a DataFrame with an additional column 'split_quad' that contains the extracted quad IDs as lists of integers. 
+    The original 'Quads' column is left unchanged.
+    '''
 
-        # Read the CNPS csv file
-        file_path = Path(file_path)    
-    
-        cnps = pd.read_csv(file_path)
+    # Read the CNPS csv file
+    file_path = Path(file_path)    
 
-        # Refactor the 'Quads' column to extract the quad IDs as a list of integers
-        cnps["split_quad"] = (cnps["Quads"].str.findall(r'\d+')).apply(
-        lambda lst: [int(x) for x in lst] if isinstance(lst, list) else []
-        )
-        return cnps
-        
+    cnps = pd.read_csv(file_path)
 
-# %%
+    # Refactor the 'Quads' column to extract the quad IDs as a list of integers
+    cnps["split_quad"] = (cnps["Quads"].str.findall(r'\d+')).apply(
+    lambda lst: [int(x) for x in lst] if isinstance(lst, list) else []
+    )
+    return cnps  
+#%%
 # Create a function to plot the distribution of CNDDB species occurrences.
 def plot_cnddb_species_distribution(df):
     fig, ax = plt.subplots()
@@ -57,9 +54,23 @@ def plot_cnddb_species_distribution(df):
 # %%
 # Create a function to plot the distribution of CNDDB species occurrences in Streamlit.
 def plot_cnddb_species_distribution_streamlit(df):
+    '''
+        Plot the distribution of CNDDB species occurrences as a horizontal bar chart in Streamlit.
+        
+        Parameters
+        -----------
+        df : pd.DataFrame
+            DataFrame containing the queried project specific CNDDB species occurrence data with at least 'SNAME' and 'OCCNUMBER' columns.
+        
+        Returns
+        -----------
+        Displays a horizontal bar chart in Streamlit showing the distribution of species occurrences, with species names on the y-axis and occurrence counts on the x-axis.
+    '''
+    
+    # Drop geometry column for plotting.
     chart_data = df.drop(columns='geometry')
     
-    # Group by ELMCODE (reliable species ID), keep SNAME for display
+    # Group by ELMCODE, keep SNAME for display, calculate occurrence count.
     chart_data = (
         chart_data.groupby('ELMCODE', as_index=False)
         .agg(
@@ -69,6 +80,7 @@ def plot_cnddb_species_distribution_streamlit(df):
         .sort_values('occurrence_count', ascending=False)
     )
     
+    # Plot a horizontal bar chart of species occurrence counts.
     fig = px.bar(
         chart_data,
         x='occurrence_count',
@@ -81,8 +93,9 @@ def plot_cnddb_species_distribution_streamlit(df):
         }
     )
     
+    # Customize the layout for better aesthetics.
     fig.update_layout(
-        height=800,
+        height=600,
         font_family='Roboto',
         font_color='#333333',
         plot_bgcolor='white',
@@ -92,21 +105,21 @@ def plot_cnddb_species_distribution_streamlit(df):
     st.plotly_chart(fig, width='stretch')
 
 #%%
-def plot_cnddb_species_date_range(df):
-    df = df.copy()
-    df["ELMDATE"] = pd.to_datetime(df["ELMDATE"], format="%Y%m%d")
-    df["LASTUPDATE"] = pd.to_datetime(df["LASTUPDATE"], format="%Y%m%d")
+# def plot_cnddb_species_date_range(df):
+#     df = df.copy()
+#     df["ELMDATE"] = pd.to_datetime(df["ELMDATE"], format="%Y%m%d")
+#     df["LASTUPDATE"] = pd.to_datetime(df["LASTUPDATE"], format="%Y%m%d")
     
-    fig = px.timeline(df, 
-                      x_start="ELMDATE", 
-                      x_end="LASTUPDATE", 
-                      y="SNAME", 
-                      title="Species Occurrence Date Range")
+#     fig = px.timeline(df, 
+#                       x_start="ELMDATE", 
+#                       x_end="LASTUPDATE", 
+#                       y="SNAME", 
+#                       title="Species Occurrence Date Range")
     
-    fig.update_layout(xaxis_range=["1950-01-01", "2025-01-01"])
+#     fig.update_layout(xaxis_range=["1950-01-01", "2025-01-01"])
 
-    fig.show()
-    return fig
+#     fig.show()
+#     return fig
 # %%
 
 # def plot_species_map(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.GeoDataFrame, output_path: str = None):
@@ -141,39 +154,57 @@ def plot_cnddb_species_date_range(df):
 #     plt.show()
 
 #%%
-def plot_species_map(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.GeoDataFrame, project_boundary_gdf: gpd.GeoDataFrame = None, output_path: str = None):
+# def plot_species_map(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.GeoDataFrame, project_boundary_gdf: gpd.GeoDataFrame = None, output_path: str = None):
     
-    cnddb_wgs = cnddb_map_data.to_crs(epsg=3857)
-    boundary_wgs = boundary.to_crs(epsg=3857)
+#     cnddb_wgs = cnddb_map_data.to_crs(epsg=3857)
+#     boundary_wgs = boundary.to_crs(epsg=3857)
 
-    cnddb_clipped = gpd.clip(cnddb_wgs, boundary_wgs)
+#     cnddb_clipped = gpd.clip(cnddb_wgs, boundary_wgs)
     
-    fig, ax = plt.subplots(figsize=(10, 10))
+#     fig, ax = plt.subplots(figsize=(10, 10))
 
-    cnddb_clipped.plot(ax=ax, column="SNAME", legend=True, alpha=0.6, zorder=2)
-    boundary_wgs.plot(ax=ax, facecolor="none", edgecolor="blue", linewidth=2, zorder=3)  # buffer in blue
+#     cnddb_clipped.plot(ax=ax, column="SNAME", legend=True, alpha=0.6, zorder=2)
+#     boundary_wgs.plot(ax=ax, facecolor="none", edgecolor="blue", linewidth=2, zorder=3)  # buffer in blue
 
-    # Optionally overlay the original project boundary in red
-    if project_boundary_gdf is not None:
-        project_boundary_gdf.to_crs(epsg=3857).plot(ax=ax, facecolor="none", edgecolor="red", linewidth=2, zorder=4)
+#     # Optionally overlay the original project boundary in red
+#     if project_boundary_gdf is not None:
+#         project_boundary_gdf.to_crs(epsg=3857).plot(ax=ax, facecolor="none", edgecolor="red", linewidth=2, zorder=4)
 
-    minx, miny, maxx, maxy = boundary_wgs.total_bounds
-    padding = 5000
-    ax.set_xlim(minx - padding, maxx + padding)
-    ax.set_ylim(miny - padding, maxy + padding)
+#     minx, miny, maxx, maxy = boundary_wgs.total_bounds
+#     padding = 5000
+#     ax.set_xlim(minx - padding, maxx + padding)
+#     ax.set_ylim(miny - padding, maxy + padding)
 
-    ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik, zorder=1)
+#     ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik, zorder=1)
 
-    ax.set_title("Species Occurrences in Project Area")
-    ax.set_xlabel("Longitude")
-    ax.set_ylabel("Latitude")
+#     ax.set_title("Species Occurrences in Project Area")
+#     ax.set_xlabel("Longitude")
+#     ax.set_ylabel("Latitude")
     
-    plt.tight_layout()
-    st.pyplot(fig)
+#     plt.tight_layout()
+#     st.pyplot(fig)
 
 #%%
 # Create a function to plot the species occurrences on an interactive map using PyDeck.
 def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.GeoDataFrame, project_boundary_gdf: gpd.GeoDataFrame = None, output_path: str = None):
+    '''
+    Plot the species occurrences on an interactive map using PyDeck in Streamlit.
+    
+    Parameters
+    -----------
+    
+    cnddb_map_data : gpd.GeoDataFrame
+        GeoDataFrame containing the queried project specific CNDDB species occurrence data with geometry data.
+    boundary : gpd.GeoDataFrame
+        GeoDataFrame containing the buffered boundary geometry.
+    project_boundary_gdf : gpd.GeoDataFrame, optional
+        GeoDataFrame containing the original uploaded project boundary geometry, default is None.
+    
+    Returns
+    -----------
+    Displays an interactive map in Streamlit showing the species occurrences within the buffered search area, with the original project boundary overlaid if provided. 
+    The map includes tooltips with species information.
+    '''
 
     TAXONGROUP_COLORS = {
     'Amphibians': [253, 161, 106], 'Birds': [253, 161, 106], 'Fish': [253, 161, 106],
@@ -187,15 +218,14 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
     cnddb_wgs = cnddb_map_data.to_crs(epsg=4326)
     boundary_wgs = boundary.to_crs(epsg=4326)
 
-    # Buffer in projected CRS (meters), then reproject to WGS84
-    # clip_mask = boundary.copy()
-    # clip_mask['geometry'] = boundary.geometry.buffer(100)  # 100 meters
-    # clip_mask = clip_mask.to_crs(epsg=4326)
+    # Reproject to projected CRS for buffering (California Albers)
+    clip_mask = boundary.to_crs(epsg=3310) 
 
-    # Reproject to projected CRS for buffering
-    clip_mask = boundary.to_crs(epsg=3310)  # California Albers
-    clip_mask['geometry'] = clip_mask.geometry.buffer(100)  # 100 meters
-    clip_mask = clip_mask.to_crs(epsg=4326)  # back to WGS84 for clipping
+    # Buffer the boundary by 100 meters to ensure we capture nearby occurrences.
+    clip_mask['geometry'] = clip_mask.geometry.buffer(100) 
+
+    # Reproject the buffered mask back to WGS84 for clipping and mapping.
+    clip_mask = clip_mask.to_crs(epsg=4326)  
 
     # Clip the species occurrences to the buffered boundary.
     cnddb_clipped = gpd.clip(cnddb_wgs, clip_mask)
@@ -211,19 +241,19 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
     default_color = [150, 150, 150]
     cnddb_clipped = cnddb_clipped.copy()
     cnddb_clipped['fill_color'] = cnddb_clipped['TAXONGROUP'].map(
-    lambda x: TAXONGROUP_COLORS.get(x, default_color) + [150]  # append alpha
+    lambda x: TAXONGROUP_COLORS.get(x, default_color) + [150]  
     )
     cnddb_clipped['line_color'] = cnddb_clipped['TAXONGROUP'].map(
     lambda x: TAXONGROUP_COLORS.get(x, default_color)
     )
 
-        # Create species layer. 
+    # Create species layer. 
     species_layer = pdk.Layer(
         type="GeoJsonLayer",
         data=cnddb_clipped, 
         stroked=True,
         filled=True,
-        get_fill_color='fill_color',    # reference the column
+        get_fill_color='fill_color',    
         get_line_color='line_color',
         line_width_min_pixels=1,
         pickable=True,
@@ -268,9 +298,10 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
 
     # Map species, project boundary, and buffered search area layers using PyDeck.
     st.pydeck_chart(pdk.Deck(
-        layers=layers,                                                                                      # Map the defined layers to the map.
-        initial_view_state=view_state,                                                                      # Set the initial view state to center on the search area.
-        map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",                          # Add a basemap.
+        layers=layers,                                                                 # Map the defined layers to the map.
+        initial_view_state=view_state,                                                 # Set the initial view state to center on the search area.
+        map_style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",     # Add a basemap.
+        # Configure tooltip to show species information on hover.
         tooltip={
     "html": "<b>{SNAME}</b> ({CNAME})<br/>"
             "<b>ELMCODE:</b> {ELMCODE}<br/>"
@@ -291,6 +322,36 @@ def plot_species_map_streamlit(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.G
         "padding": "8px",
         "borderRadius": "4px",
     }
-}       # Configure tooltip to show species information on hover.
+} 
     ))
 #%%
+# Create a function to plot the taxon group distribution as a pie chart in Streamlit.
+def plot_taxon_pie_streamlit(cnddb_species):
+    '''
+    Plot the taxon group distribution of CNDDB species occurrences as a pie chart in Streamlit.
+    
+    Parameters
+    -----------
+    cnddb_species : pd.DataFrame
+        DataFrame containing the queried project specific CNDDB species occurrence data.
+        
+    Returns
+    -----------
+    Displays a pie chart in Streamlit showing the distribution of species occurrences by taxon group.
+    '''
+
+    # Count the number of species in each taxon group.
+    counts = cnddb_species['TAXONGROUP'].value_counts().reset_index()
+    counts.columns = ['TAXONGROUP', 'count']
+    
+    # Create a pie chart of taxon group distributions.
+    fig = px.pie(counts, names='TAXONGROUP', values='count', color_discrete_sequence=px.colors.qualitative.Set2)
+    
+    # Customize the layout for better aesthetics.
+    fig.update_layout(
+        height=600,
+        font_family='Roboto',
+        font_color='#333333',
+    )
+    
+    st.plotly_chart(fig, width='stretch')

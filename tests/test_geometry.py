@@ -4,7 +4,7 @@ import geopandas as gpd
 from shapely.geometry import box
 import pytest
 
-from src.geometry import get_bounding_box, _cell_map_code, get_quads, get_species_cnps, get_species_cnddb
+from src.geometry import _cell_map_code, get_quads, get_species_cnps, get_species_cnddb
 
 def _make_boundary():
     boundary_geom = box(-120.0, 34.0, -119.5, 34.5)
@@ -45,17 +45,17 @@ def _make_quads():
 #     assert gdf.crs == gpd.crs.from_epsg(4326)
     
 
-def test_get_bounding_box():
-    # Arrange
-    boundary_gdf = _make_boundary()
+# def test_get_bounding_box():
+#     # Arrange
+#     boundary_gdf = _make_boundary()
 
-    # Act
-    bbox = get_bounding_box(boundary_gdf)
+#     # Act
+#     bbox = get_bounding_box(boundary_gdf)
 
-    # Assert
-    # Check that the bounding box is a tuple of (minx, miny, maxx, maxy).
-    assert isinstance(bbox, np.ndarray)
-    assert len(bbox) == 4
+#     # Assert
+#     # Check that the bounding box is a tuple of (minx, miny, maxx, maxy).
+#     assert isinstance(bbox, np.ndarray)
+#     assert len(bbox) == 4
 
 
 def test_get_quads():
