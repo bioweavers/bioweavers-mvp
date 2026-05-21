@@ -98,11 +98,12 @@ def create_pto_template(output_path="src/pto_template.docx"):
     group_header[0].text = "{{ group.TaxonGroup }}"
 
     # Start the inner  docxtpl loop
-    # Names must match the keys produced by format_cnps(), format_cnddb(),
-    # and make_buffer()
+    # This repeats one species row for each row inside the current taxon group
     table.rows[3].cells[0].text = "{%tr for row in group.rows %}"
 
-    # Species data row
+    # Add placeholders for one species data row
+    # Names must match keys produced by format_cnps(), format_cnddb(),
+    # and make_buffer()
     data = table.rows[4].cells
     data[0].text = "{{ row.SpeciesDisplay }}"
     data[1].text = "{{ row.StatusDisplay }}"
@@ -110,7 +111,7 @@ def create_pto_template(output_path="src/pto_template.docx"):
     data[3].text = "{{ row.PotentialtoOccur }}"
     data[4].text = "{{ row.HabitatSuitabilityObservations }}"
 
-    # You need two extra rows for the loop endings
+    # End the inner species row loop
     row_end = table.add_row().cells
     row_end[0].text = "{%tr endfor %}"
 
