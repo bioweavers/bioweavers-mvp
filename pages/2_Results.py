@@ -1,7 +1,6 @@
 # Import necessary libraries.
 import streamlit as st
 
-
 # Import necessary functions from src modules.
 from src.species import plot_species_map_streamlit, plot_taxon_pie_streamlit, refactor_cnps, plot_cnddb_species_distribution_streamlit
 
@@ -33,6 +32,9 @@ project_boundary_gdf = st.session_state.project_boundary_gdf
 # Map CNDDB species occurrences within the project boundary.
 st.header("CNDDB Species Map", divider="blue")
 plot_species_map_streamlit(cnddb_species, search_area, project_boundary_gdf) 
+
+# 
+st.caption("Plant species colored in green. Wildlife species colored in orange.")
 
 # Page header.
 st.header("CNDDB Analysis Output", divider='blue')
@@ -82,6 +84,22 @@ st.download_button(
     mime="text/csv",
     icon=":material/download:")
 
+st.markdown("""
+    <style>
+    [data-testid="stDownloadButton"] button {
+        background-color: #5b7e95;
+        color: #FFFFFF;
+        border-radius: 8px;
+    }
+    [data-testid="stDownloadButton"] button:hover {
+        background-color: #5b7e95;
+        color: #FFFFFF;
+        border-radius: 8px;
+        opacity: 0.6;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Display the results in tables.
 st.subheader("California Native Plant Society Species Results")
 st.write(f"Found {len(cnps_species)} species occurrences")
@@ -90,7 +108,7 @@ st.dataframe(cnps_species.drop(columns='split_quad'))
 # Convert CNPS results to CSV for download.
 cnps_csv = cnps_species.drop(columns='split_quad').to_csv(index=False)
 
-# Allow user to customize the file name.
+# Allow user to customize the file name
 custom_cnps_file_name = st.text_input(label="Rename the CNPS species results CSV file (optional)",
                                  value="cnps_species").strip()
 
@@ -104,9 +122,9 @@ st.download_button(
 
 # Add page link buttons to navigate to the previous and next pages.
 with st.container(horizontal=True):
-    st.page_link("Landing.py", label="Go to Previous Page: Landing Page", width='content', icon_position="left")
+    st.page_link("pages/1_Landing.py", label="Go to Previous Page: Landing Page", width='content', icon_position="left")
     st.space("stretch")
-    st.page_link("pages/2_Table.py", label="Go to Next Page: Potential to Occur Table Page", width='content', icon_position="right")
+    st.page_link("pages/3_Table.py", label="Go to Next Page: Potential to Occur Table Page", width='content', icon_position="right")
 
 # Styling for the page link button.
 st.markdown("""
@@ -126,6 +144,7 @@ st.markdown("""
         padding: 12px 24px;
         border-radius: 8px;
         font-size: 16px;
+        opacity: 0.6
     }
     </style>
 """, unsafe_allow_html=True)

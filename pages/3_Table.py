@@ -206,6 +206,22 @@ with st.form("pto_editor_form"):
         key="pto_editor_form_table",
     )
 
+    st.markdown("""
+    <style>
+    [data-testid="stFormSubmitButton"] button {
+        background-color: #5b7e95;
+        color: #FFFFFF;
+        border-radius: 8px;
+    }
+    [data-testid="stFormSubmitButton"] button:hover {
+        background-color: #5b7e95;
+        color: #FFFFFF;
+        border-radius: 8px;
+        opacity: 0.6;
+    }
+    </style>
+    """, unsafe_allow_html=True)    
+
     # Display a submit button to save edits
     save_clicked = st.form_submit_button("Save Edits",
                                          shortcut="Enter",
@@ -238,6 +254,22 @@ if docx_bytes is not None:
     # Build the final downloadable .docx file name
     file_name = f"{base_name or 'pto_report'}.docx"
 
+    st.markdown("""
+    <style>
+    [data-testid="stDownloadButton"] button {
+        background-color: #5b7e95;
+        color: #FFFFFF;
+        border-radius: 8px;
+    }
+    [data-testid="stDownloadButton"] button:hover {
+        background-color: #5b7e95;
+        color: #FFFFFF;
+        border-radius: 8px;
+        opacity: 0.6;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     # Display the download button
     st.download_button(
         label="Export to Word",
@@ -245,3 +277,31 @@ if docx_bytes is not None:
         file_name=file_name,
         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     )
+
+with st.container(horizontal=True):
+    st.page_link("pages/2_Results.py", label="Go to Previous Page: Potential to Occur Table Page", width='content', icon_position="right")
+    st.space("stretch")
+    st.page_link("Home.py", label="Go to Home Page", width='content', icon_position="left")
+
+# Styling for the page link button.
+st.markdown("""
+    <style>
+    [data-testid="stPageLink"] a {
+        background-color: #375673;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+    [data-testid="stPageLink"] a p {
+        color: #FFFFFF !important;
+    }
+    [data-testid="stPageLink"] a:hover {
+        background-color: #375673;
+        color: #FFFFFF !important;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        opacity: 0.6
+    }
+    </style>
+""", unsafe_allow_html=True)

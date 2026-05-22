@@ -17,6 +17,9 @@ from shapely.geometry import Polygon
 import debugpy
 import tempfile
 import os
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Set up Streamlit app configuration and debugging.
 # The following code checks if a debug client is already connected. If not, it attempts to listen for debug connections on port 5678. This allows you to attach a debugger (e.g., from VS Code) to the Streamlit app for debugging purposes. The try-except block handles the case where the port might already be in use, which can happen in certain environments that don't support debugging.
@@ -27,9 +30,9 @@ if not debugpy.is_client_connected():
         pass # Handle the case where the port is already in use (e.g., when running in an environment that doesn't support debugging).
 
 st.session_state.DEBUG = True
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title="Bio Weaver Tool", page_icon="leaf")
 
-rincon_logo = 'images/Rincon_Logo_Color.png'
+rincon_logo = Path(__file__).parent.parent / "images" / "Rincon_Logo_Color.png"
 st.logo(rincon_logo, size='large')
 
 # Title of the page.
@@ -45,15 +48,16 @@ from src.species import plot_species_map_streamlit, refactor_cnps, plot_cnddb_sp
 # Import data and perform necessary preprocessing at startup.
 
 # Load all California quads data once at startup
-all_quads_path = Path("data/california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson")
+# all_quads_path = Path("../data/california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson")
+all_quads_path = Path(__file__).parent.parent / "data" / "california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson"
 all_quads = load_all_quads(all_quads_path) 
 
 # Load CNPS data once at startup.
-cnps_path = Path("data/CNPS_RAW.csv")
+cnps_path = Path(__file__).parent.parent / "data" / "CNPS_RAW.csv"
 cnps = refactor_cnps(cnps_path)
 
 # Load CNDDB data once at startup.
-cnddb_path = Path("data/cnddb_obfs_dataset_V3/cnddb_obfs_dataset_V3.shp")
+cnddb_path = Path(__file__).parent.parent / "data" / "cnddb_obfs_dataset_V3" / "cnddb_obfs_dataset_V3.shp"
 cnddb = gpd.read_file(cnddb_path)
 
 # Create file upload button for user to upload their own boundary file (GeoJSON format).
@@ -264,32 +268,34 @@ if uploaded_file is not None:
         # Signal that results are ready to be viewed on other pages.
         st.session_state.results_ready = True      
 
+        # Add page link buttons to navigate to the previous and next pages.
+        with st.container(horizontal=True):
+            st.page_link("Home.py", label="Go to Previous Page: Home Page", width='content', icon_position="left")
+            st.space("stretch")
+            st.page_link("pages/2_Results.py", label="Go to Next Page: Results Page", width='content', icon_position="right")
+
         # Styling for the page link button.
         st.markdown("""
             <style>
             [data-testid="stPageLink"] a {
                 background-color: #375673;
-                color: var(--primary-foreground-color) !important;
                 padding: 12px 24px;
                 border-radius: 8px;
                 font-size: 16px;
             }
             [data-testid="stPageLink"] a p {
-            color: #FFFFFF !important;
+                color: #FFFFFF !important;
             }
             [data-testid="stPageLink"] a:hover {
                 background-color: #375673;
-                opacity: 0.85;
                 color: #FFFFFF !important;
                 padding: 12px 24px;
                 border-radius: 8px;
                 font-size: 16px;
+                opacity 0.6
             }
             </style>
-        """, unsafe_allow_html=True)     
-
-        # Add a button to navigate to the Results page, once steps on Landing page are completed.
-        st.page_link("pages/1_Results.py", label="Go to Results Page", width='content', icon_position="right")
+        """, unsafe_allow_html=True)
 
 
 
