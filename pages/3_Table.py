@@ -6,9 +6,13 @@ import streamlit as st
 from src.format_data import format_cnddb, format_cnps
 from src.make_buffer import make_buffer
 
+# Import Bioweaver logo
+bioweaver_logo = 'images/Bioweaver_logo.png'
+
 # Configure Streamlit page settings
-st.set_page_config(page_title="Potential to Occur Reporting Tool",
-                   layout="wide")
+st.set_page_config(page_title = "Bio Weaver Tool",
+                   layout="wide",
+                    page_icon=bioweaver_logo)
 
 # Display the Rincon logo in the sidebar and page area
 rincon_logo = 'images/Rincon_Logo_Color.png'

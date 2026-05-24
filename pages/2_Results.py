@@ -4,6 +4,14 @@ import streamlit as st
 # Import necessary functions from src modules.
 from src.species import plot_species_map_streamlit, plot_taxon_pie_streamlit, refactor_cnps, plot_cnddb_species_distribution_streamlit
 
+# Import Bioweaver logo
+bioweaver_logo = 'images/Bioweaver_logo.png'
+
+# Configure Streamlit page settings
+st.set_page_config(page_title = "Bio Weaver Tool",
+                   layout="wide",
+                    page_icon=bioweaver_logo)
+
 # Add the Rincon logo to the top left of the page.
 rincon_logo = 'images/Rincon_Logo_Color.png'
 st.logo(rincon_logo, size='large')
