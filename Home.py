@@ -38,9 +38,9 @@ st.header("Navigate through the dashboard...",
             text_alignment='center')
 
 # Add page navigation text.
-st.markdown("<p style='font-size:20px'><strong>Landing Page:</strong> Upload your project boundary and apply a buffer.</p>", 
+st.markdown("<p style='font-size:20px'><strong>Spatial Search Page:</strong> Upload your project boundary and apply a buffer.</p>", 
             unsafe_allow_html=True, text_alignment='center')
-st.markdown("<p style='font-size:20px'><strong>Result Page:</strong> View species found in your project area.</p>", 
+st.markdown("<p style='font-size:20px'><strong>Results Page:</strong> View species found in your project area.</p>", 
             unsafe_allow_html=True, text_alignment='center')
 st.markdown("<p style='font-size:20px'><strong>Table Page:</strong> Review the Potential to Occur Table and export to Word.</p>", 
             unsafe_allow_html=True, text_alignment='center')
@@ -73,6 +73,6 @@ st.markdown("""
 with st.container(horizontal=True):
     st.space("stretch")
     # Add a button to navigate to the Results page, once steps on Landing page are completed.
-    st.page_link("pages/1_Landing.py", label="Start Your Analysis", width='content', icon_position="right")
+    st.page_link("pages/1_Search.py", label="Start Your Analysis", width='content', icon_position="right")
     st.space("stretch")
 

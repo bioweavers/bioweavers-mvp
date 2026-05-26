@@ -130,7 +130,7 @@ st.download_button(
 
 # Add page link buttons to navigate to the previous and next pages.
 with st.container(horizontal=True):
-    st.page_link("pages/1_Landing.py", label="Go to Previous Page: Landing Page", width='content', icon_position="left")
+    st.page_link("pages/1_Search.py", label="Go to Previous Page: Spatial Search Page", width='content', icon_position="left")
     st.space("stretch")
     st.page_link("pages/3_Table.py", label="Go to Next Page: Potential to Occur Table Page", width='content', icon_position="right")
 

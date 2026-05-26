@@ -36,7 +36,7 @@ rincon_logo = Path(__file__).parent.parent / "images" / "Rincon_Logo_Color.png"
 st.logo(rincon_logo, size='large')
 
 # Title of the page.
-st.title('Landing Page')
+st.title('Spatial Search Page')
 
 # View uploaded boundary.
 st.header("Upload Project Boundary", divider="blue")
