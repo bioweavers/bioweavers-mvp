@@ -5,10 +5,15 @@ __pycache__/
 output/
 .DS_Store
 
+# Ignore the CNDDB large data set file - V2 version.
+# This data is only used for testing and is not needed in the repo or final deliverable.
 data/cnddb_obfs_dataset_V2
-
 data/cnddb_obfs_dataset_V2.csv
+
 .Rproj.user
 .claude/
 .pytest_cache/
+
+# Ignore the CNDDB large data set file - V3 version.
+# This data is only used for testing and is not needed in the repo or final deliverable.
 data/cnddb_obfs_dataset_V3/

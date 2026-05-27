@@ -1,6 +1,6 @@
 services:
 
-  # Dashboard application service - runs the Plotly Dash app
+  # Dashboard application service - runs the Streamlit app
   bioweaver_dashboard:
     image: bioweaver_dashboard:latest
     build: .
@@ -8,7 +8,6 @@ services:
       - ./data:/tmp/data/
       - ./pages:/pages/
       - ./src:/src/
-  
     ports:
       - 3009:3009
     environment:

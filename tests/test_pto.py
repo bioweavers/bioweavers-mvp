@@ -1,4 +1,4 @@
-"""Tests for the PTO (Plants That Occur) Word-document export pipeline.
+"""Tests for the PTO (Potential to Occur) Word-document export pipeline.
 
 Covers:
   * build_cnps_records / build_cnddb_records — DataFrame row -> template dict.
@@ -6,7 +6,7 @@ Covers:
   * An end-to-end integration test that mirrors the original demo script,
     skipping gracefully when fixture data or templates are missing.
 
-Also runnable as a script (``python tests/gigi_pto_test.py``) to regenerate
+Also runnable as a script (``python tests/test_pto.py``) to regenerate
 the demo document into the repo's outputs directory.
 """
 

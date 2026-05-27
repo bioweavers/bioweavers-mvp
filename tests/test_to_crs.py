@@ -20,7 +20,7 @@ from src.geometry import safe_to_crs
 SAMPLE_GEOJSON = Path(__file__).parents[1] / "fixtures" / "sample_boundary.geojson"
 
 
-# --- fixtures --------------------------------------------------------------
+# --- Fixtures --------------------------------------------------------------
 
 @pytest.fixture
 def california_gdf():
@@ -53,7 +53,7 @@ def sample_boundary_gdf():
     return gpd.read_file(SAMPLE_GEOJSON)
 
 
-# --- happy path ------------------------------------------------------------
+# --- Happy Path ------------------------------------------------------------
 
 def test_reprojects_california_to_3310(california_gdf):
     """A WGS84 polygon inside California reprojects cleanly to CA Albers."""
@@ -89,7 +89,7 @@ def test_roundtrip_preserves_geometry(california_gdf):
     assert all(abs(a - b) < 1e-6 for a, b in zip(orig, final))
 
 
-# --- failure modes ---------------------------------------------------------
+# --- Failure Modes ---------------------------------------------------------
 
 def test_raises_on_empty_gdf():
     empty = gpd.GeoDataFrame({"geometry": []}, crs="EPSG:4326")

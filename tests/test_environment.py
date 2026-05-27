@@ -2,7 +2,7 @@
 
 Background
 ----------
-We've been bitten by `gdf.to_crs(...)` returning empty or non-finite geometries
+Throughout the project we've struggled with `gdf.to_crs(...)` returning empty or non-finite geometries
 on collaborator machines, even in supposedly-correct conda envs. The root cause
 is almost always one of:
 
@@ -32,9 +32,9 @@ from pathlib import Path
 import pytest
 
 
-# --- minimum versions ------------------------------------------------------
-# Pinned to the lowest version we've verified works correctly together. Bump
-# when you've tested a newer combination.
+# --- Minimum versions ------------------------------------------------------
+# Pinned to the lowest version we've verified works correctly together, as of June 2026. 
+# These can be changes when you've tested and verified a newer combination.
 
 MIN_GEOPANDAS = (1, 0, 0)
 MIN_SHAPELY = (2, 0, 0)
@@ -64,7 +64,7 @@ def _fmt(v: tuple[int, int, int]) -> str:
     return ".".join(str(x) for x in v)
 
 
-# --- version checks --------------------------------------------------------
+# --- Version Checks --------------------------------------------------------
 
 def test_geopandas_minimum_version():
     """Geopandas 1.0+ uses Shapely 2's C internals; older versions can't.
@@ -116,7 +116,7 @@ def test_pyogrio_available_and_recent():
     )
 
 
-# --- infrastructure: PROJ data must exist ----------------------------------
+# --- Infrastructure: PROJ data must exist ----------------------------------
 
 def test_proj_data_dir_exists():
     """pyproj needs a data dir on disk to load proj.db. Missing dir => silent
@@ -144,7 +144,7 @@ def test_proj_db_is_findable():
     )
 
 
-# --- functional: the actual failure mode -----------------------------------
+# --- Functional: the actual failure mode -----------------------------------
 # These tests catch the silent-failure case directly: if to_crs is producing
 # inf/NaN/empty output, *these* fail with diagnostics, regardless of whether
 # the version checks above pass.
@@ -253,7 +253,7 @@ def test_to_crs_preserves_polygon_topology():
     )
 
 
-# --- diagnostic test: always passes, prints env summary --------------------
+# --- Diagnostic Test: always passes, prints env summary --------------------
 
 def test_print_environment_summary(capsys):
     """Always passes. Captures and prints a fingerprint of the geospatial

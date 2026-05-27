@@ -6,7 +6,7 @@ import streamlit as st
 from src.format_data import format_cnddb, format_cnps
 from src.make_buffer import make_buffer
 
-# Import Bioweaver logo
+# Import Bio Weaver logo
 bioweaver_logo = 'images/Bioweaver_logo.png'
 
 # Configure Streamlit page settings

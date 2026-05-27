@@ -1,0 +1,38 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.5, 34.5]
+      },
+      "properties": {
+        "SNAME": "Species X",
+        "TAXONGROUP": "Plant"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.6, 34.6]
+      },
+      "properties": {
+        "SNAME": "Species Y",
+        "TAXONGROUP": "Animal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.0, 36.0]
+      },
+      "properties": {
+        "SNAME": "Species Z",
+        "TAXONGROUP": "Plant"
+      }
+    }
+  ]
+}

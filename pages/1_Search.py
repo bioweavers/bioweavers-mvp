@@ -48,15 +48,21 @@ from src.species import plot_species_map_streamlit, refactor_cnps, plot_cnddb_sp
 # Import data and perform necessary preprocessing at startup.
 
 # Load all California quads data once at startup
+# This dataset is required for the 9-quad search. Do not change the path or filename.
 # all_quads_path = Path("../data/california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson")
 all_quads_path = Path(__file__).parent.parent / "data" / "california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson"
 all_quads = load_all_quads(all_quads_path) 
 
 # Load CNPS data once at startup.
+# This dataset can be updated with new CNPS data as needed, but the filename and path must remain consistent for the code to work.
+# File in the file path should be named as follows: "CNPS_RAW.csv".
 cnps_path = Path(__file__).parent.parent / "data" / "CNPS_RAW.csv"
 cnps = refactor_cnps(cnps_path)
 
 # Load CNDDB data once at startup.
+# This dataset can be updated with new CNDDB data as needed, but the filename and path must remain consistent for the code to work.
+# The application expects a shapefile format for the CNDDB dataset.
+# Folder in the file path should be named as follows: "CNDDB_RAW" / "CNDDB_RAW.shp".
 cnddb_path = Path(__file__).parent.parent / "data" / "cnddb_obfs_dataset_V3" / "cnddb_obfs_dataset_V3.shp"
 cnddb = gpd.read_file(cnddb_path)
 
