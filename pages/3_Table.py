@@ -227,7 +227,7 @@ with st.form("pto_editor_form"):
     """, unsafe_allow_html=True)    
 
     # Display a submit button to save edits
-    save_clicked = st.form_submit_button("Save Edits",
+    save_clicked = st.form_submit_button("Please click to save edits before exporting",
                                          shortcut="Enter",
                                          width="stretch")
 
