@@ -32,7 +32,7 @@ def format_cnps(df):
     """
     Format raw CNPS data for the Potential to Occur editable table.
 
-    This function convers CNPS source columns into the standardized columns
+    This function converts CNPS source columns into the standardized columns
     used by the Streamlit PTO table and Word export.
 
     Expected Input Columns
