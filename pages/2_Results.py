@@ -25,26 +25,31 @@ if not st.session_state.get("results_ready"):
     st.info("Run a search on the main page first.")
     st.stop()   # Halts execution of the rest of the page.
 
-# Retrieve the filtered CNDDB species occurrences queried by page 1.
-cnddb_species = st.session_state.cnddb_raw
-
-# Retrieve the filtered CNPS species occurrences queried by page 1.
-cnps_species = st.session_state.cnps_raw
-
-# Retrieve the search area geometry (buffered boundary or 9-quad selection) from page 1.
-search_area = st.session_state.search_area
-
-# Retrieve the original uploaded project boundary GeoDataFrame from page 1.
-project_boundary_gdf = st.session_state.project_boundary_gdf
-
-# Map CNDDB species occurrences within the project boundary.
+# Add header
 st.header("CNDDB Species Map", divider="blue")
-plot_species_map_streamlit(cnddb_species, search_area, project_boundary_gdf) 
 
-# 
-st.caption("Plant species colored in green. Wildlife species colored in orange.")
+# Loading message
+with st.spinner("Populating species map..."):
 
-# Page header.
+    # Retrieve the filtered CNDDB species occurrences queried by page 1.
+    cnddb_species = st.session_state.cnddb_raw
+
+    # Retrieve the filtered CNPS species occurrences queried by page 1.
+    cnps_species = st.session_state.cnps_raw
+
+    # Retrieve the search area geometry (buffered boundary or 9-quad selection) from page 1.
+    search_area = st.session_state.search_area
+
+    # Retrieve the original uploaded project boundary GeoDataFrame from page 1.
+    project_boundary_gdf = st.session_state.project_boundary_gdf
+
+    # Map CNDDB species occurrences within the project boundary.
+    plot_species_map_streamlit(cnddb_species, search_area, project_boundary_gdf) 
+
+    # Caption
+    st.caption("Plant species colored in green. Wildlife species colored in orange.")
+
+# Page header
 st.header("CNDDB Analysis Output", divider='blue')
 
 # Example of side by side visualizations.

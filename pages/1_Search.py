@@ -41,37 +41,39 @@ st.title('Spatial Search Page')
 # View uploaded boundary.
 st.header("Upload Project Boundary", divider="blue")
 
-# Import necessary functions from src modules.
-from src.geometry import _cell_map_code, load_boundary, create_buffer, load_all_quads, get_quads, get_species_cnps, get_species_cnddb, get_neighbors
-from src.species import plot_species_map_streamlit, refactor_cnps, plot_cnddb_species_distribution_streamlit
+# Loading message
+with st.spinner("Loading data..."):
+    # Import necessary functions from src modules.
+    from src.geometry import _cell_map_code, load_boundary, create_buffer, load_all_quads, get_quads, get_species_cnps, get_species_cnddb, get_neighbors
+    from src.species import plot_species_map_streamlit, refactor_cnps, plot_cnddb_species_distribution_streamlit
 
-# Import data and perform necessary preprocessing at startup.
+    # Import data and perform necessary preprocessing at startup.
 
-# Load all California quads data once at startup
-# This dataset is required for the 9-quad search. Do not change the path or filename.
-# all_quads_path = Path("../data/california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson")
-all_quads_path = Path(__file__).parent.parent / "data" / "california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson"
-all_quads = load_all_quads(all_quads_path) 
+    # Load all California quads data once at startup
+    # This dataset is required for the 9-quad search. Do not change the path or filename.
+    # all_quads_path = Path("../data/california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson")
+    all_quads_path = Path(__file__).parent.parent / "data" / "california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson"
+    all_quads = load_all_quads(all_quads_path) 
 
-# Load CNPS data once at startup.
-# This dataset can be updated with new CNPS data as needed, but the filename and path must remain consistent for the code to work.
-# File in the file path should be named as follows: "CNPS_RAW.csv".
-cnps_path = Path(__file__).parent.parent / "data" / "CNPS_RAW.csv"
-cnps = refactor_cnps(cnps_path)
+    # Load CNPS data once at startup.
+    # This dataset can be updated with new CNPS data as needed, but the filename and path must remain consistent for the code to work.
+    # File in the file path should be named as follows: "CNPS_RAW.csv".
+    cnps_path = Path(__file__).parent.parent / "data" / "CNPS_RAW.csv"
+    cnps = refactor_cnps(cnps_path)
 
-# Load CNDDB data once at startup.
-# This dataset can be updated with new CNDDB data as needed, but the filename and path must remain consistent for the code to work.
-# The application expects a shapefile format for the CNDDB dataset.
-# Folder in the file path should be named as follows: "CNDDB_RAW" / "CNDDB_RAW.shp".
-cnddb_path = Path(__file__).parent.parent / "data" / "cnddb_obfs_dataset_V3" / "cnddb_obfs_dataset_V3.shp"
-cnddb = gpd.read_file(cnddb_path)
+    # Load CNDDB data once at startup.
+    # This dataset can be updated with new CNDDB data as needed, but the filename and path must remain consistent for the code to work.
+    # The application expects a shapefile format for the CNDDB dataset.
+    # Folder in the file path should be named as follows: "CNDDB_RAW" / "CNDDB_RAW.shp".
+    cnddb_path = Path(__file__).parent.parent / "data" / "cnddb_obfs_dataset_V3" / "cnddb_obfs_dataset_V3.shp"
+    cnddb = gpd.read_file(cnddb_path)
 
-# Create file upload button for user to upload their own boundary file (GeoJSON format).
-uploaded_file = st.file_uploader(
-    label="Please upload the project boundary GeoJSON file.",
-    type='geojson',
-    accept_multiple_files=False,
-    help="Drag and drop a .geojson file here, or click to browse.")
+    # Create file upload button for user to upload their own boundary file (GeoJSON format).
+    uploaded_file = st.file_uploader(
+        label="Please upload the project boundary GeoJSON file.",
+        type='geojson',
+        accept_multiple_files=False,
+        help="Drag and drop a .geojson file here, or click to browse.")
 
 # Save to session state only when a new file is uploaded.
 if uploaded_file is not None:
@@ -155,7 +157,7 @@ if uploaded_file is not None:
 
     # Create a button to apply the selected buffer and perform the search.
     run_buffer = st.button("Apply Buffer", type="primary")  
-
+    
     # Only runs when clicked.
     if run_buffer:  
         if buffer_choice == '2-Mile':

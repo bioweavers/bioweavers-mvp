@@ -71,13 +71,11 @@ def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
     #if st.session_state.DEBUG:
         #st.info("Starting create_buffer()...")
 
-    # TODO: Add documentation
     # Distance should be in meters to match the 
     # CRS we will use for buffering (California Albers)
    
     # Create a copy of the GeoDataFrame to avoid modifying the original
     gdf_buffered = gdf.copy()
-    
 
     #if st.session_state.DEBUG:
         #st.info(f"\t Ensuring gdf CRS. Current value: {gdf_buffered.crs}")

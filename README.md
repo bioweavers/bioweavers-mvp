@@ -1,35 +1,44 @@
 # Bio Weavers MVP
 
-Proof-of-life pipeline for querying iNaturalist observations around a project boundary, buffering the area, and exporting species lists.
-
-## Goals (Session 1)
-1. Get dev environments working
-2. Establish repo structure
-3. Implement core geometry/species/export functions
-4. Add tests for core logic (no network required)
+Developement repository for the Bio Weaver tool. This repository contains all files that were worked on by the capstone team throughout the creation of the Bio Weaver tool and a full commit history. 
 
 ## Project Structure
 ```
 bioweavers-mvp/
-├── README.md
-├── environment.yml          # Supported install (conda-forge)
-├── conda-lock.yml           # Pinned cross-platform lockfile (optional)
-├── src/
-│   ├── __init__.py
-│   ├── geometry.py
-│   ├── species.py
-│   └── export.py
-├── tests/
-│   ├── test_geometry.py
-│   └── test_species.py
+.
 ├── data/
-│   └── sample_boundary.geojson
+│   ├── cnddb/                  # Shapefile (.dbf, .prj, .shp, .shx)
+│   ├── cnps.csv
+│   └── california_statewide_index_of_usgs_24k_7_5_minute_quad_topo_maps.geojson
+├── docs/
+│   ├── PLAN.md
+│   └── PLAN.html
 ├── examples/
-│   └── word_export/         # DataFrame → Word document demo
-├── output/
-├── notebooks/
-└── docs/
-    └── PLAN.md
+│   └── word_export/            # Templating tutorial & demo
+├── pages/                      # Streamlit pages
+│   ├── 1_Search.py
+│   ├── 2_Results.py
+│   └── 3_Table.py
+├── src/                        # Core functions
+│   ├── format_data.py
+│   ├── geometry.py
+│   ├── make_buffer.py
+│   ├── species.py
+│   ├── export.py
+│   └── pto_template.docx
+├── tests/
+│   ├── fixtures/
+│   │   ├── test_cnddb_data.geojson
+│   │   └── test_cnps_data.csv
+│   ├── conftest.py
+│   ├── test_geometry.py
+│   ├── test_pto.py
+│   └── ...
+├── Home.py                     # Streamlit landing page
+├── environment.yml
+├── docker-compose.yml   
+├── Dockerfile
+└── README.md
 ```
 
 ## Quickstart
@@ -118,17 +127,6 @@ python -m ipykernel install --user --name bioweavers-mvp --display-name "Bio Wea
 ```
 
 Then select the **Bio Weavers** kernel in Jupyter.
-
-## Core Pipeline (Proof-of-Life)
-1. Load GeoJSON/KML boundary
-2. Create buffer (2 / 5 / 10 miles)
-3. Query iNaturalist API with bounding box
-4. Build species list + filter federally listed
-5. Export CSV / Excel
-
-### Notes
-- Buffering reprojects to **EPSG:5070 (NAD83 / Conus Albers)** for meter-accurate buffers across the western US, then returns to EPSG:4326 for API usage.
-- iNaturalist requests are not executed in tests; network tests can be added later.
 
 ## Examples
 

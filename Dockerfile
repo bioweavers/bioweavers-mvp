@@ -13,7 +13,7 @@ RUN micromamba env create -f environment.yml
 # Copy the entire application code into the container.
 COPY . .
 
-# Expose teh port that the app runs on.
+# Expose the port that the app runs on.
 EXPOSE 3009
 
 # Command to run the application with the mamba environment activated.
