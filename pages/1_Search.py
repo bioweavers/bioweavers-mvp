@@ -153,7 +153,7 @@ if uploaded_file is not None:
     buffer_option_names = ['2-Mile', '5-Mile', '10-Mile', '9-Quad']
 
     # Create a radio button for buffer search options.
-    buffer_choice = st.radio("Select a buffer search option:", buffer_option_names, key="buffer_radio")
+    buffer_choice = st.radio("Select a buffer search option:", options=buffer_option_names, key="buffer_radio", index=1)
 
     # Create a button to apply the selected buffer and perform the search.
     run_buffer = st.button("Apply Buffer", type="primary")  

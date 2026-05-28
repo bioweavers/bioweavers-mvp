@@ -1,6 +1,6 @@
 services:
 
-  # Dashboard application service - runs the Streamlit app
+  # Dashboard application service - runs the Streamlit app.
   bioweaver_dashboard:
     image: bioweaver_dashboard:latest
     build: .
