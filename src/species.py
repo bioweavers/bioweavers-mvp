@@ -42,15 +42,6 @@ def refactor_cnps(file_path: str | Path) -> pd.DataFrame:
     lambda lst: [int(x) for x in lst] if isinstance(lst, list) else []
     )
     return cnps  
-#%%
-# Create a function to plot the distribution of CNDDB species occurrences.
-def plot_cnddb_species_distribution(df):
-    fig, ax = plt.subplots()
-    ax.bar(df["OCCNUMBER"], df["SNAME"])
-    ax.set_title("Species Distribution")
-    ax.set_xlabel("Species Name")
-    ax.set_ylabel("Number of Occurrences")
-    return fig
 # %%
 # Create a function to plot the distribution of CNDDB species occurrences in Streamlit.
 def plot_cnddb_species_distribution_streamlit(df):
@@ -103,86 +94,6 @@ def plot_cnddb_species_distribution_streamlit(df):
     )
     
     st.plotly_chart(fig, width='stretch')
-
-#%%
-# def plot_cnddb_species_date_range(df):
-#     df = df.copy()
-#     df["ELMDATE"] = pd.to_datetime(df["ELMDATE"], format="%Y%m%d")
-#     df["LASTUPDATE"] = pd.to_datetime(df["LASTUPDATE"], format="%Y%m%d")
-    
-#     fig = px.timeline(df, 
-#                       x_start="ELMDATE", 
-#                       x_end="LASTUPDATE", 
-#                       y="SNAME", 
-#                       title="Species Occurrence Date Range")
-    
-#     fig.update_layout(xaxis_range=["1950-01-01", "2025-01-01"])
-
-#     fig.show()
-#     return fig
-# %%
-
-# def plot_species_map(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.GeoDataFrame, output_path: str = None):
-    
-#     # Reproject to WGS84
-#     cnddb_wgs = cnddb_map_data.to_crs(epsg=4326)
-#     boundary_wgs = boundary.to_crs(epsg=4326)
-    
-#     fig, ax = plt.subplots(figsize=(10, 10))
-    
-#     boundary_wgs.plot(ax=ax, 
-#                       color="none", 
-#                       edgecolor="black", 
-#                       linewidth=2)
-    
-#     cnddb_wgs.plot(ax=ax, 
-#                    column="SNAME", 
-#                    legend=True, 
-#                    alpha=0.6)
-
-#     minx, miny, maxx, maxy = cnddb_wgs.total_bounds
-#     padding = 0.1
-#     ax.set_xlim(minx - padding, maxx + padding)
-#     ax.set_ylim(miny - padding, maxy + padding)
-
-#     ax.set_title("Species Occurrences in Project Area")
-#     ax.set_xlabel("Longitude")
-#     ax.set_ylabel("Latitude")
-    
-#     plt.tight_layout()
-    
-#     plt.show()
-
-#%%
-# def plot_species_map(cnddb_map_data: gpd.GeoDataFrame, boundary: gpd.GeoDataFrame, project_boundary_gdf: gpd.GeoDataFrame = None, output_path: str = None):
-    
-#     cnddb_wgs = cnddb_map_data.to_crs(epsg=3857)
-#     boundary_wgs = boundary.to_crs(epsg=3857)
-
-#     cnddb_clipped = gpd.clip(cnddb_wgs, boundary_wgs)
-    
-#     fig, ax = plt.subplots(figsize=(10, 10))
-
-#     cnddb_clipped.plot(ax=ax, column="SNAME", legend=True, alpha=0.6, zorder=2)
-#     boundary_wgs.plot(ax=ax, facecolor="none", edgecolor="blue", linewidth=2, zorder=3)  # buffer in blue
-
-#     # Optionally overlay the original project boundary in red
-#     if project_boundary_gdf is not None:
-#         project_boundary_gdf.to_crs(epsg=3857).plot(ax=ax, facecolor="none", edgecolor="red", linewidth=2, zorder=4)
-
-#     minx, miny, maxx, maxy = boundary_wgs.total_bounds
-#     padding = 5000
-#     ax.set_xlim(minx - padding, maxx + padding)
-#     ax.set_ylim(miny - padding, maxy + padding)
-
-#     ctx.add_basemap(ax, source=ctx.providers.OpenStreetMap.Mapnik, zorder=1)
-
-#     ax.set_title("Species Occurrences in Project Area")
-#     ax.set_xlabel("Longitude")
-#     ax.set_ylabel("Latitude")
-    
-#     plt.tight_layout()
-#     st.pyplot(fig)
 
 #%%
 # Create a function to plot the species occurrences on an interactive map using PyDeck.
@@ -355,3 +266,25 @@ def plot_taxon_pie_streamlit(cnddb_species):
     )
     
     st.plotly_chart(fig, width='stretch')
+
+#%%
+# CREATE ADDITIONAL FUNCTIONS THAT PRODUCE DATA VISUALIZATIONS FOR THE SPECIES DATA AS NEEDED.
+# Example of an attempted plot of the date range of species occurrences...
+# Create a function to plot the species occurrences date range as a timeline.
+# def plot_cnddb_species_date_range_streamlit(df):
+#     df = df.copy()
+#     df["ELMDATE"] = pd.to_datetime(df["ELMDATE"], format="%Y%m%d")
+#     df["LASTUPDATE"] = pd.to_datetime(df["LASTUPDATE"], format="%Y%m%d")
+    
+#     fig = px.timeline(df, 
+#                       x_start="ELMDATE", 
+#                       x_end="LASTUPDATE", 
+#                       y="SNAME", 
+#                       title="Species Occurrence Date Range")
+    
+#     fig.update_layout(xaxis_range=["1950-01-01", "2025-01-01"])
+
+#     fig.show()
+#     return fig
+
+# This function would then be called in `2_Results.py` to display the timeline visualization in Streamlit with the project-specific data.

@@ -68,6 +68,11 @@ def create_buffer(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
     Returns a GeoDataFrame with the buffered geometry. 
     The original GeoDataFrame is not modified.
     '''
+
+    # During the development phase, `create_buffer()` produced many silent failures and error messages that were difficult to debug.
+    # We used `st.session_state.DEBUG:` as a tool to print debug messages to the Streamlit app at various stages of the function to understand where and why the failures were occurring.
+    # These lines of code are commented out now, but they were instrumental in identifying issues, and may be helpful for future debugging if similar issues arise again.
+
     #if st.session_state.DEBUG:
         #st.info("Starting create_buffer()...")
 
@@ -282,43 +287,6 @@ def get_species_cnps(cnps_df, quad_ids):
     return cnps_species
 
 # %%
-
-# Create a function to get the species from the CNDDB data that are found in the quads that intersect with the boundary.
-# def get_species_cnddb(file_path: str | Path, quad_ids):
-#     '''
-#     Get the species from the CNDDB data that are found in the quads that intersect with the boundary.
-
-#     Parameters
-#     ----------
-#     cnps_df : pd.DataFrame
-#         DataFrame containing the CNDDB species data, which includes a column 'KEYQUAD' that lists the quad IDs associated with each species.
-#     quad_ids : set
-#         A set of quad IDs that intersect with the boundary
-
-#     Returns
-#     ----------
-#     pd.DataFrame
-#         A DataFrame containing the species from the CNDDB data that are found in the quads that intersect with the boundary.
-#     '''
-
-#     excluded_taxongroups = {
-#         'Dune', 'Forest', 'Herbaceous', 'Inland Waters', 'Marsh', 'Riparian', 'Scrub', 'Woodland', 'Palustrine'
-#     }
-
-#     # Read the CNDDB csv file
-#     file_path = Path(file_path)    
-#     cnddb_gdf = gpd.read_file(file_path)
-
-#     cnddb_species = cnddb_gdf[
-#         cnddb_gdf['KEYQUAD'].astype(str).isin([str(q) for q in quad_ids]) &
-#         ~cnddb_gdf['TAXONGROUP'].isin(excluded_taxongroups)
-#     ].copy()
-
-#     # Filter the CNDDB DataFrame to include only the rows where the 'KEYQUAD' column contains a quad ID that is in the set of quad IDs that intersect with the boundary.
-#     #cnddb_species = cnddb_gdf[cnddb_gdf['KEYQUAD'].isin(quad_ids)].copy()
-#     return cnddb_species
-
-# %%
 # Create a function to get the species from the CNDDB data that spatially intersect with the search area.
 def get_species_cnddb(file_path: str | Path, boundary: gpd.GeoDataFrame):
     '''
@@ -362,6 +330,7 @@ def get_species_cnddb(file_path: str | Path, boundary: gpd.GeoDataFrame):
     return cnddb_species
 
 # %%
+# Explicit checks of the functionality of the geometry handling and processing of the functions within this script.
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
@@ -387,10 +356,9 @@ if __name__ == "__main__":
     ax.set_title("Intersecting Quads and Project Boundary")
     plt.show()
 # %%
-
 import geopandas as gpd
 from pyproj import CRS
-
+# A function used to check and debug the geometry handling and processing within this script.
 def safe_to_crs(gdf: gpd.GeoDataFrame, target_epsg: int) -> gpd.GeoDataFrame:
     """to_crs with explicit checks for the four ways it silently produces garbage."""
     n = len(gdf)
